@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.4.0-00d4aa.svg?style=flat-square" alt="Version 2.4.0">
+  <img src="https://img.shields.io/badge/version-2.4.1-00d4aa.svg?style=flat-square" alt="Version 2.4.1">
   <img src="https://img.shields.io/badge/PWA-Ready-0090ff.svg?style=flat-square" alt="PWA Ready">
   <img src="https://img.shields.io/badge/Offline-First-22c55e.svg?style=flat-square" alt="Offline First">
   <img src="https://img.shields.io/badge/Dependencies-Zero-a855f7.svg?style=flat-square" alt="Zero Dependencies">
