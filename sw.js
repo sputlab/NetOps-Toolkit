@@ -1,10 +1,10 @@
 /**
  * NetOps Toolkit - Service Worker
- * Version: 2.3.2
+ * Version: 2.4.0
  * Provides full offline PWA capabilities with stale-while-revalidate / cache-first strategies.
  */
 
-const CACHE_NAME = 'netops-toolkit-v2.3.2';
+const CACHE_NAME = 'netops-toolkit-v2.4.0';
 const STATIC_ASSETS = [
   './',
   './index.html',

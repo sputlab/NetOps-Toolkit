@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.3.2-00d4aa.svg?style=flat-square" alt="Version 2.3.2">
+  <img src="https://img.shields.io/badge/version-2.4.0-00d4aa.svg?style=flat-square" alt="Version 2.4.0">
   <img src="https://img.shields.io/badge/PWA-Ready-0090ff.svg?style=flat-square" alt="PWA Ready">
   <img src="https://img.shields.io/badge/Offline-First-22c55e.svg?style=flat-square" alt="Offline First">
   <img src="https://img.shields.io/badge/Dependencies-Zero-a855f7.svg?style=flat-square" alt="Zero Dependencies">
@@ -36,7 +36,9 @@
 - **Visual Subnetting (Split Network)**: Subdivide any parent network into smaller equal-sized blocks with instantaneous binary boundary calculation.
 - **VLSM (Variable Length Subnet Mask)**: Dynamically sizes and arranges subnets based on required host counts in optimal descending order, checking base network capacity and boundary alignment.
 
-### 2. 🔍 IP Tools
+### 2. 🔍 IP & IPv6 Tools
+- **IPv6 Subnet & Prefix Calculator**: 128-bit BigInt calculations for IPv6 prefixes (`/0` to `/128`). Calculates start/end range, total `/64` subnets (e.g. 65,536 for `/48`), total addresses, Solicited-Node Multicast address (`ff02::1:ff...`), and divides parent prefixes into smaller subnets (`/56`, `/64`).
+- **IPv6 Expansion & Compression (RFC 5952)**: Canonical RFC 5952 zero-compression, full 32-character expansion, reverse DNS PTR domain (`ip6.arpa`), and 128-bit binary representation.
 - **IP Address Inspector**: Identifies address family (IPv4/IPv6), class (A/B/C/D/E), RFC status (RFC 1918 Private, APIPA link-local, loopback, multicast, public), integer representation, and binary/hex octets.
 - **IP Representation Converter**: Instant conversion between Dotted Decimal, 32-bit Integer, Binary, and Hexadecimal.
 - **Wildcard Mask Tools**: Bidirectional calculation between Subnet Mask, Wildcard Mask, and CIDR prefix.
@@ -55,9 +57,12 @@
 - **Throughput & Link Utilization**: Real-time gauge calculating used vs. available bandwidth with warning and critical thresholds.
 - **Data Unit Converter**: High-precision conversion across bits, bytes, KB, MB, GB, and TB.
 
-### 5. 🔄 Converters & Encoders
+### 5. 🔄 Converters, QoS & Encoders
+- **QoS: DSCP ↔ ToS ↔ CoS (802.1p) Suite**: Bidirectional converter and visual 8-bit IP header inspector (`[6-bit DSCP | 2-bit ECN]`). Maps DSCP (0–63), ToS Byte (Hex/Dec), IP Precedence (0–7), 802.1p CoS (0–7), and Per-Hop Behavior (PHB). Includes a complete searchable reference table with quick filters for Voice/Video, Critical Data, Network Control, and Scavenger/Bulk.
 - **Multi-Base Numeric Converter**: Bidirectional live conversion across Decimal, Binary, Hexadecimal, and Octal.
 - **MAC Address Inspector**: Formats MAC addresses into IEEE colon (`AA:BB:CC:DD:EE:FF`), hyphenated (`AA-BB-CC-DD-EE-FF`), and Cisco (`AABB.CCDD.EEFF`) notations. Decodes OUI and identifies Multicast vs. Unicast and Universally vs. Locally Administered addresses.
+- **Subnet Mask ↔ CIDR Converter**: Instant bi-directional translation.
+- **Text Encoders**: Encodes raw text into Hexadecimal, Base64, and URL-encoded formats with one-click copy buttons.
 - **Subnet Mask ↔ CIDR Converter**: Instant bi-directional translation.
 - **Text Encoders**: Encodes raw text into Hexadecimal, Base64, and URL-encoded formats with one-click copy buttons.
 

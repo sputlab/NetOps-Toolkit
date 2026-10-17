@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NetOps Toolkit v2.3.2</title>
+<title>NetOps Toolkit v2.4.0</title>
 <meta name="description" content="Professional network toolkit: subnet calculator, VLSM, IP tools, ports, bandwidth, Wi-Fi, security. Works offline as PWA.">
 <meta name="theme-color" content="#0a0e1a">
 <link rel="manifest" href="manifest.json">
@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NetOps">
-<meta property="og:title" content="NetOps Toolkit v2.3.2">
+<meta property="og:title" content="NetOps Toolkit v2.4.0">
 <meta property="og:description" content="Professional network toolkit: subnet calculator, VLSM, IP tools, ports, bandwidth, Wi-Fi, security. Works offline as PWA.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="assets/icon-512.png">
@@ -135,7 +135,7 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
         <button class="lang-btn active" onclick="setLang('it')" id="lang-it">IT</button>
         <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
       </div>
-      <span class="badge">v2.3.2</span>
+      <span class="badge">v2.4.0</span>
     </div>
   </div>
 </div>
@@ -364,6 +364,47 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
     </div>
     <div id="range-result"></div>
   </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-purple"></span><span data-i18n="ipv6SubnetTitle">Calcolatore Subnet IPv6 &amp; Prefissi</span></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px" data-i18n="ipv6SubnetHint">Inserisci prefisso IPv6 e maschera CIDR (es. 2001:db8:acad::/48).</div>
+    <div class="input-row">
+      <div>
+        <label for="v6-ip" data-i18n="ipv6Prefix">Prefisso IPv6</label>
+        <input type="text" id="v6-ip" value="2001:db8:acad::" placeholder="2001:db8:acad::">
+      </div>
+      <div>
+        <label for="v6-cidr" data-i18n="cidr">CIDR</label>
+        <input type="text" id="v6-cidr" value="48" placeholder="48">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="calcIPv6Subnet()" data-i18n="calcIPv6">Calcola IPv6 ▶</button>
+    <div id="v6-result" style="margin-top:10px;display:none"></div>
+    <div id="v6-split-sec" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:none">
+      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px" data-i18n="splitIPv6Title">Suddivisione Subnet IPv6</div>
+      <div class="input-row">
+        <div>
+          <label for="v6-split-cidr" data-i18n="targetPrefix">Nuovo Prefisso CIDR</label>
+          <input type="number" id="v6-split-cidr" value="64" min="1" max="128">
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button class="btn btn-ghost btn-full" onclick="splitIPv6()" data-i18n="splitIPv6Btn">Dividi IPv6 ▶</button>
+        </div>
+      </div>
+      <div id="v6-split-result"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-teal"></span><span data-i18n="ipv6ExpandTitle">Espansione, Compressione &amp; Reverse DNS (IPv6)</span></div>
+    <div class="input-row full">
+      <div>
+        <label for="v6exp-in" data-i18n="ipv6Input">Indirizzo IPv6</label>
+        <input type="text" id="v6exp-in" value="2001:db8::1" placeholder="es. 2001:db8::1" oninput="processIPv6Format()">
+      </div>
+    </div>
+    <div id="v6exp-result" style="margin-top:8px"></div>
+  </div>
 </div>
 
 <!-- ===== PORTS ===== -->
@@ -534,6 +575,73 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
       </div>
     </div>
     <div id="enc-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-teal"></span><span data-i18n="qosTitle">QoS: DSCP ↔ ToS ↔ CoS (802.1p)</span></div>
+    <div class="input-row">
+      <div>
+        <label for="qos-select" data-i18n="qosSelect">Seleziona Classe DSCP</label>
+        <select id="qos-select" onchange="onSelectDSCP(this.value)">
+          <option value="46" selected>EF (46) – Expedited Forwarding (Voice RTP)</option>
+          <option value="44">VA (44) – Voice-Admit</option>
+          <option value="34">AF41 (34) – Interactive Video</option>
+          <option value="36">AF42 (36) – Interactive Video (Med Drop)</option>
+          <option value="38">AF43 (38) – Interactive Video (High Drop)</option>
+          <option value="32">CS4 (32) – Real-Time Video Streaming</option>
+          <option value="26">AF31 (26) – Mission-Critical Data</option>
+          <option value="28">AF32 (28) – Mission-Critical Data (Med Drop)</option>
+          <option value="30">AF33 (30) – Mission-Critical Data (High Drop)</option>
+          <option value="24">CS3 (24) – Call Signaling (SIP/H.323)</option>
+          <option value="18">AF21 (18) – Transactional Data</option>
+          <option value="20">AF22 (20) – Transactional Data (Med Drop)</option>
+          <option value="22">AF23 (22) – Transactional Data (High Drop)</option>
+          <option value="16">CS2 (16) – OAM / Network Management</option>
+          <option value="10">AF11 (10) – Bulk Data / Scavenger (Low Drop)</option>
+          <option value="12">AF12 (12) – Bulk Data (Med Drop)</option>
+          <option value="14">AF13 (14) – Bulk Data (High Drop)</option>
+          <option value="8">CS1 (8) – Scavenger / Background</option>
+          <option value="0">CS0 / BE (0) – Best Effort (Default)</option>
+          <option value="48">CS6 (48) – Network Control (OSPF, BGP)</option>
+          <option value="56">CS7 (56) – Critical Network Control</option>
+        </select>
+      </div>
+      <div>
+        <label for="qos-in" data-i18n="dscpCustom">Valore DSCP (0–63) o ToS (Hex/Dec)</label>
+        <input type="text" id="qos-in" value="46" placeholder="es. 46, EF, 0xB8" oninput="onInputQoS(this.value)">
+      </div>
+    </div>
+
+    <!-- 8-bit Header Bit Visualization -->
+    <div style="margin:10px 0;background:var(--bg3);padding:8px 10px;border-radius:var(--r);font-family:var(--font-mono);font-size:11px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;color:var(--text3);font-size:10px">
+        <span>DSCP (6 bit)</span>
+        <span>ECN (2 bit)</span>
+      </div>
+      <div id="qos-bit-bar" style="display:flex;gap:3px;height:24px"></div>
+    </div>
+
+    <div id="qos-result"></div>
+
+    <!-- Searchable Reference Table with Filter Buttons -->
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+        <button class="btn btn-ghost btn-sm btn-qos active" data-qos-cat="" onclick="filterQosTable('',this)" data-i18n="dscpFilterAll">Tutti</button>
+        <button class="btn btn-ghost btn-sm btn-qos" data-qos-cat="voice" onclick="filterQosTable('voice',this)" data-i18n="dscpFilterVoice">Voce / Video</button>
+        <button class="btn btn-ghost btn-sm btn-qos" data-qos-cat="data" onclick="filterQosTable('data',this)" data-i18n="dscpFilterData">Dati</button>
+        <button class="btn btn-ghost btn-sm btn-qos" data-qos-cat="control" onclick="filterQosTable('control',this)" data-i18n="dscpFilterControl">Controllo Rete</button>
+        <button class="btn btn-ghost btn-sm btn-qos" data-qos-cat="bulk" onclick="filterQosTable('bulk',this)" data-i18n="dscpFilterBulk">Best Effort / Bulk</button>
+      </div>
+      <input type="text" id="qos-search" placeholder="Cerca classe QoS..." oninput="searchQosTable()" style="margin-bottom:8px">
+      <div class="table-scroll" style="max-height:260px;overflow-y:auto">
+        <table class="result-table">
+          <thead>
+            <tr><th>Classe</th><th>DSCP</th><th>Hex</th><th>ToS Byte</th><th>IPP</th><th>CoS</th><th data-i18n="qosUse">Uso</th></tr>
+          </thead>
+          <tbody id="qos-tbody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -865,7 +973,43 @@ const i18n = {
     wildcardMask:"Wildcard mask", subnetMaskLbl:"Subnet mask", cidrNotation:"Notazione CIDR",
     networkClass:"Classe di rete", addressType:"Tipo indirizzo", binaryMask:"Maschera binaria",
     whiteGreen:"Bianco-Verde", green:"Verde", whiteOrange:"Bianco-Arancio", orange:"Arancio",
-    blue:"Blu", whiteBlue:"Bianco-Blu", whiteBrown:"Bianco-Marrone", brown:"Marrone"
+    blue:"Blu", whiteBlue:"Bianco-Blu", whiteBrown:"Bianco-Marrone", brown:"Marrone",
+    ipv6SubnetTitle: "Calcolatore Subnet IPv6 & Prefissi",
+    ipv6SubnetHint: "Inserisci prefisso IPv6 e maschera CIDR (es. 2001:db8:acad::/48).",
+    ipv6Prefix: "Prefisso IPv6",
+    calcIPv6: "Calcola IPv6 ▶",
+    ipv6ExpandTitle: "Espansione, Compressione & Reverse DNS (IPv6)",
+    ipv6Input: "Indirizzo IPv6",
+    expandedFormat: "Formato Espanso (Completo)",
+    compressedFormat: "Formato Compresso (RFC 5952)",
+    reverseDns: "Reverse DNS (ip6.arpa)",
+    solicitedNode: "Solicited-Node Multicast",
+    total64Subnets: "Subnet /64 totali",
+    totalAddresses: "Indirizzi totali",
+    networkRange: "Range Indirizzi",
+    prefixLength: "Lunghezza Prefisso",
+    interfaceIdLen: "Bit Interface ID",
+    splitIPv6Title: "Suddivisione Subnet IPv6",
+    targetPrefix: "Nuovo Prefisso CIDR",
+    splitIPv6Btn: "Dividi IPv6 ▶",
+    qosTitle: "QoS: DSCP ↔ ToS ↔ CoS (802.1p)",
+    qosSelect: "Seleziona Classe DSCP",
+    dscpCustom: "Valore DSCP (0–63) o ToS (Hex/Dec)",
+    tosByte: "ToS / Traffic Class (Byte)",
+    ipPrecedence: "IP Precedence",
+    cos8021p: "802.1p CoS",
+    phbClass: "Classe PHB",
+    dropProb: "Probabilità di Drop",
+    dropLow: "Bassa (Low)",
+    dropMed: "Media (Medium)",
+    dropHigh: "Alta (High)",
+    qosUse: "Uso Consigliato",
+    dscpFilterAll: "Tutti",
+    dscpFilterVoice: "Voce / Video",
+    dscpFilterData: "Dati",
+    dscpFilterControl: "Controllo Rete",
+    dscpFilterBulk: "Best Effort / Bulk",
+    searchDscp: "Cerca classe QoS o DSCP...",
   },
   en: {
     logoSub:"Network & IT Tools", tabSubnet:"Subnet / VLSM", tabIPTools:"IP Tools", tabPorts:"Ports & Protocols",
@@ -958,7 +1102,43 @@ const i18n = {
     wildcardMask:"Wildcard mask", subnetMaskLbl:"Subnet mask", cidrNotation:"CIDR notation",
     networkClass:"Network class", addressType:"Address type", binaryMask:"Binary mask",
     whiteGreen:"White-Green", green:"Green", whiteOrange:"White-Orange", orange:"Orange",
-    blue:"Blue", whiteBlue:"White-Blue", whiteBrown:"White-Brown", brown:"Brown"
+    blue:"Blue", whiteBlue:"White-Blue", whiteBrown:"White-Brown", brown:"Brown",
+    ipv6SubnetTitle: "IPv6 Subnet & Prefix Calculator",
+    ipv6SubnetHint: "Enter IPv6 prefix and CIDR mask (e.g. 2001:db8:acad::/48).",
+    ipv6Prefix: "IPv6 Prefix",
+    calcIPv6: "Calculate IPv6 ▶",
+    ipv6ExpandTitle: "IPv6 Expansion, Compression & Reverse DNS",
+    ipv6Input: "IPv6 Address",
+    expandedFormat: "Expanded Format (Full)",
+    compressedFormat: "Compressed Format (RFC 5952)",
+    reverseDns: "Reverse DNS (ip6.arpa)",
+    solicitedNode: "Solicited-Node Multicast",
+    total64Subnets: "Total /64 Subnets",
+    totalAddresses: "Total Addresses",
+    networkRange: "Address Range",
+    prefixLength: "Prefix Length",
+    interfaceIdLen: "Interface ID Bits",
+    splitIPv6Title: "IPv6 Subnet Breakdown",
+    targetPrefix: "New CIDR Prefix",
+    splitIPv6Btn: "Split IPv6 ▶",
+    qosTitle: "QoS: DSCP ↔ ToS ↔ CoS (802.1p)",
+    qosSelect: "Select DSCP Class",
+    dscpCustom: "DSCP value (0–63) or ToS (Hex/Dec)",
+    tosByte: "ToS / Traffic Class (Byte)",
+    ipPrecedence: "IP Precedence",
+    cos8021p: "802.1p CoS",
+    phbClass: "PHB Class",
+    dropProb: "Drop Probability",
+    dropLow: "Low Drop",
+    dropMed: "Medium Drop",
+    dropHigh: "High Drop",
+    qosUse: "Recommended Use",
+    dscpFilterAll: "All",
+    dscpFilterVoice: "Voice / Video",
+    dscpFilterData: "Data",
+    dscpFilterControl: "Network Control",
+    dscpFilterBulk: "Best Effort / Bulk",
+    searchDscp: "Search QoS class or DSCP...",
   }
 };
 
@@ -999,6 +1179,16 @@ function setLang(lang) {
 function reRenderAll() {
   try {
     if (document.getElementById('sn-result').style.display !== 'none') calcSubnet();
+    if (document.getElementById('v6-result') && document.getElementById('v6-result').style.display !== 'none') calcIPv6Subnet();
+    if (document.getElementById('v6exp-result') && document.getElementById('v6exp-result').innerHTML) processIPv6Format();
+    if (document.getElementById('qos-result') && document.getElementById('qos-result').innerHTML) {
+      const qVal = parseInt(document.getElementById('qos-in').value, 10) || 46;
+      renderQoS(qVal);
+    }
+    calcIPv6Subnet();
+    processIPv6Format();
+    renderQoS(46);
+    renderQosTable(DSCP_DATABASE);
     if (document.getElementById('ipc-results').innerHTML) convertIP();
     if (document.getElementById('ip-check-result').innerHTML) checkIP();
     if (document.getElementById('cmp-result').innerHTML) compareIPs();
@@ -2213,6 +2403,415 @@ function aggregateRoutes(){
     <div style="font-size:11px;color:var(--success);margin:8px 0;font-family:var(--font-mono)">${lines.length} ${t('routes')} → ${collapsed.length} ${t('supernets')}</div>
     <div class="table-scroll"><table class="result-table"><thead><tr><th>${t('supernet')}</th><th>Mask</th><th>${t('host')}</th></tr></thead><tbody>${rows}</tbody></table></div>
   `;
+}
+
+
+/* ============================================================
+   IPV6 ENGINE & CALCULATOR
+============================================================ */
+function ipv6ToBigInt(ipStr) {
+  let full = expandIPv6(ipStr);
+  if (!full) return null;
+  return BigInt('0x' + full.replace(/:/g, ''));
+}
+
+function bigIntToIPv6(bn) {
+  let hex = bn.toString(16).padStart(32, '0');
+  let groups = [];
+  for (let i = 0; i < 32; i += 4) {
+    groups.push(hex.slice(i, i + 4));
+  }
+  return groups.join(':');
+}
+
+function expandIPv6(ip) {
+  if (!ip) return null;
+  ip = ip.trim().toLowerCase();
+  if (ip.includes('.')) {
+    const lastColon = ip.lastIndexOf(':');
+    const v4 = ip.slice(lastColon + 1);
+    const v4parts = v4.split('.').map(Number);
+    if (v4parts.length !== 4 || !v4parts.every(x => x >= 0 && x <= 255)) return null;
+    const hex1 = ((v4parts[0] << 8) | v4parts[1]).toString(16).padStart(4, '0');
+    const hex2 = ((v4parts[2] << 8) | v4parts[3]).toString(16).padStart(4, '0');
+    ip = ip.slice(0, lastColon + 1) + hex1 + ':' + hex2;
+  }
+  let parts = ip.split('::');
+  if (parts.length > 2) return null;
+  let left = parts[0] ? parts[0].split(':') : [];
+  let right = parts[1] ? parts[1].split(':') : [];
+  if (parts.length === 2) {
+    const missing = 8 - (left.length + right.length);
+    if (missing < 1) return null;
+    parts = [...left, ...Array(missing).fill('0000'), ...right];
+  } else {
+    parts = left;
+  }
+  if (parts.length !== 8) return null;
+  for (let i = 0; i < 8; i++) {
+    if (!/^[0-9a-f]{1,4}$/.test(parts[i])) return null;
+    parts[i] = parts[i].padStart(4, '0');
+  }
+  return parts.join(':');
+}
+
+function compressIPv6(fullIp) {
+  if (!fullIp) return '';
+  let blocks = fullIp.split(':').map(b => b.replace(/^0+(?!$)/, ''));
+  let longestStart = -1, longestLen = 0;
+  let curStart = -1, curLen = 0;
+  for (let i = 0; i < blocks.length; i++) {
+    if (blocks[i] === '0') {
+      if (curStart === -1) { curStart = i; curLen = 1; }
+      else { curLen++; }
+    } else {
+      if (curLen > longestLen && curLen > 1) {
+        longestStart = curStart;
+        longestLen = curLen;
+      }
+      curStart = -1; curLen = 0;
+    }
+  }
+  if (curLen > longestLen && curLen > 1) {
+    longestStart = curStart;
+    longestLen = curLen;
+  }
+  if (longestLen > 1) {
+    blocks.splice(longestStart, longestLen, '');
+    let res = blocks.join(':');
+    if (longestStart === 0) res = ':' + res;
+    if (longestStart + longestLen === 8) res = res + ':';
+    return res;
+  }
+  return blocks.join(':');
+}
+
+function getIPv6ReverseDNS(fullIp) {
+  const hex = fullIp.replace(/:/g, '');
+  return hex.split('').reverse().join('.') + '.ip6.arpa';
+}
+
+function getSolicitedNodeMulticast(fullIp) {
+  const hex = fullIp.replace(/:/g, '');
+  const last24 = hex.slice(26);
+  return compressIPv6('ff02:0000:0000:0000:0000:0001:ff' + last24.slice(0, 2) + ':' + last24.slice(2));
+}
+
+function getIPv6Type(bigint) {
+  const hex = bigint.toString(16).padStart(32, '0');
+  if (bigint === 1n) return 'Loopback (::1)';
+  if (bigint === 0n) return 'Unspecified (::)';
+  if (hex.startsWith('00000000000000000000ffff')) return 'IPv4-mapped (::ffff:0:0/96)';
+  if (hex.startsWith('fe8') || hex.startsWith('fe9') || hex.startsWith('fea') || hex.startsWith('feb')) return 'Link-Local (fe80::/10)';
+  if (hex.startsWith('fc') || hex.startsWith('fd')) return 'Unique Local Unicast / ULA (fc00::/7)';
+  if (hex.startsWith('20010db8')) return 'Documentation (2001:db8::/32)';
+  if (hex.startsWith('2002')) return '6to4 (2002::/16)';
+  if (hex.startsWith('20010000')) return 'Teredo (2001::/32)';
+  if (hex.startsWith('ff')) return 'Multicast (ff00::/8)';
+  if (parseInt(hex[0], 16) >= 2 && parseInt(hex[0], 16) <= 3) return 'Global Unicast / GUA (2000::/3)';
+  return 'Reserved / Other';
+}
+
+let _lastIPv6Subnet = null;
+
+function calcIPv6Subnet() {
+  const ipInput = document.getElementById('v6-ip').value.trim();
+  let cidrInput = document.getElementById('v6-cidr').value.trim();
+  let cidr;
+  if (ipInput.includes('/')) {
+    const p = ipInput.split('/');
+    cidr = parseInt(p[1], 10);
+    document.getElementById('v6-ip').value = p[0].trim();
+  } else {
+    cidr = parseInt(cidrInput, 10);
+  }
+
+  const out = document.getElementById('v6-result');
+  const splitSec = document.getElementById('v6-split-sec');
+  if (isNaN(cidr) || cidr < 0 || cidr > 128) {
+    out.style.display = 'block';
+    out.innerHTML = `<div style="color:var(--danger);font-size:12px;margin-top:8px">${t('invalidCIDR')}</div>`;
+    return;
+  }
+  const cleanIp = document.getElementById('v6-ip').value.trim();
+  const bn = ipv6ToBigInt(cleanIp);
+  if (bn === null) {
+    out.style.display = 'block';
+    out.innerHTML = `<div style="color:var(--danger);font-size:12px;margin-top:8px">${t('ipFormat')}</div>`;
+    return;
+  }
+
+  const totalBits = 128n;
+  const mask = cidr === 0 ? 0n : ((1n << totalBits) - (1n << (totalBits - BigInt(cidr))));
+  const start = bn & mask;
+  const end = cidr === 0 ? ((1n << totalBits) - 1n) : (start | (~mask & ((1n << totalBits) - 1n)));
+
+  const fullStart = bigIntToIPv6(start);
+  const fullEnd = bigIntToIPv6(end);
+  const compStart = compressIPv6(fullStart);
+  const compEnd = compressIPv6(fullEnd);
+
+  let num64 = '0';
+  if (cidr <= 64) {
+    num64 = (1n << (64n - BigInt(cidr))).toLocaleString();
+  } else {
+    num64 = '< 1 (Sub-/64)';
+  }
+
+  let totalHostsStr = '';
+  const hostBits = 128 - cidr;
+  if (hostBits <= 48) {
+    totalHostsStr = (1n << BigInt(hostBits)).toLocaleString();
+  } else {
+    totalHostsStr = `2^${hostBits} (~${Math.pow(2, hostBits).toExponential(2)})`;
+  }
+
+  _lastIPv6Subnet = { start, cidr, fullStart, fullEnd };
+
+  out.style.display = 'block';
+  splitSec.style.display = 'block';
+  document.getElementById('v6-split-cidr').value = Math.min(128, cidr <= 48 ? 64 : cidr <= 56 ? 64 : cidr + 4);
+
+  out.innerHTML = `
+    <div class="info-grid">
+      ${pill(t('network'), compStart + '/' + cidr, 'var(--accent)')}
+      ${pill(t('classType'), getIPv6Type(start))}
+      ${pill(t('firstHost'), compStart, 'var(--success)')}
+      ${pill(t('lastHost'), compEnd, 'var(--accent3)')}
+      ${pill(t('total64Subnets'), num64, 'var(--accent2)')}
+      ${pill(t('totalAddresses'), totalHostsStr)}
+      ${pill(t('interfaceIdLen'), (128 - cidr) + ' bit')}
+      ${pill(t('solicitedNode'), getSolicitedNodeMulticast(fullStart))}
+    </div>
+    <div style="margin-top:8px">
+      <button class="btn btn-ghost btn-sm" onclick="copyText('${compStart}/${cidr}')">${t('copy')} Prefix</button>
+      <button class="btn btn-ghost btn-sm" onclick="copyText('${getIPv6ReverseDNS(fullStart)}')">Copy Reverse DNS</button>
+    </div>
+  `;
+}
+
+function splitIPv6() {
+  if (!_lastIPv6Subnet) return;
+  const targetCidr = parseInt(document.getElementById('v6-split-cidr').value, 10);
+  const out = document.getElementById('v6-split-result');
+  const baseCidr = _lastIPv6Subnet.cidr;
+  if (isNaN(targetCidr) || targetCidr <= baseCidr || targetCidr > 128) {
+    out.innerHTML = `<div style="color:var(--danger);font-size:11px;margin-top:6px">${t('splitInvalid')}</div>`;
+    return;
+  }
+
+  const diff = targetCidr - baseCidr;
+  const count = 1n << BigInt(diff);
+  const showCount = count > 32n ? 32n : count;
+  const step = 1n << (128n - BigInt(targetCidr));
+
+  let rows = '';
+  for (let i = 0n; i < showCount; i++) {
+    const subStart = _lastIPv6Subnet.start + i * step;
+    const subEnd = subStart + step - 1n;
+    const compS = compressIPv6(bigIntToIPv6(subStart));
+    const compE = compressIPv6(bigIntToIPv6(subEnd));
+    rows += `<tr>
+      <td style="color:var(--text3)">#${i + 1n}</td>
+      <td style="color:var(--accent)">${compS}/${targetCidr}</td>
+      <td style="color:var(--success)">${compS}</td>
+      <td style="color:var(--accent3)">${compE}</td>
+    </tr>`;
+  }
+
+  out.innerHTML = `
+    <div style="font-size:11px;color:var(--text3);margin:8px 0;font-family:var(--font-mono)">
+      ${count.toLocaleString()} ${t('subnetCount')} /${targetCidr} ${count > 32n ? `(${t('showing')} 32)` : ''}
+    </div>
+    <div class="table-scroll"><table class="result-table">
+      <thead><tr><th>#</th><th>Subnet</th><th>Start</th><th>End</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+  `;
+}
+
+function processIPv6Format() {
+  const raw = document.getElementById('v6exp-in').value.trim();
+  const out = document.getElementById('v6exp-result');
+  if (!raw) { out.innerHTML = ''; return; }
+  const expanded = expandIPv6(raw);
+  if (!expanded) {
+    out.innerHTML = `<div style="color:var(--danger);font-size:11px;margin-top:6px">${t('ipFormat')}</div>`;
+    return;
+  }
+  const compressed = compressIPv6(expanded);
+  const revDns = getIPv6ReverseDNS(expanded);
+  const solicited = getSolicitedNodeMulticast(expanded);
+  const hex = expanded.replace(/:/g, '');
+  const bin = hex.split('').map(c => parseInt(c, 16).toString(2).padStart(4, '0')).join('').match(/.{16}/g).join(' ');
+
+  out.innerHTML = `
+    <div class="result-label">${t('compressedFormat')}</div>
+    <div class="result-box"><span style="color:var(--accent)">${compressed}</span><button class="copy-btn" onclick="copyText('${compressed}')">⎘</button></div>
+    <div class="result-label">${t('expandedFormat')}</div>
+    <div class="result-box"><span style="font-size:11px;color:var(--accent2)">${expanded}</span><button class="copy-btn" onclick="copyText('${expanded}')">⎘</button></div>
+    <div class="result-label">${t('reverseDns')}</div>
+    <div class="result-box"><span style="font-size:10px;word-break:break-all">${revDns}</span><button class="copy-btn" onclick="copyText('${revDns}')">⎘</button></div>
+    <div class="result-label">Solicited-Node Multicast</div>
+    <div class="result-box"><span style="color:var(--accent4)">${solicited}</span><button class="copy-btn" onclick="copyText('${solicited}')">⎘</button></div>
+    <div class="result-label">Binary (128-bit)</div>
+    <div class="result-box"><span style="font-size:9px;word-break:break-all">${bin}</span><button class="copy-btn" onclick="copyText('${bin}')">⎘</button></div>
+  `;
+}
+
+/* ============================================================
+   QOS: DSCP ↔ TOS ↔ COS (802.1P)
+============================================================ */
+const DSCP_DATABASE = [
+  { name: 'CS0 / BE', dscp: 0,  ipp: 0, cos: 0, cat: 'bulk', drop: 'N/A',  use: 'Best Effort / Default unclassified internet traffic' },
+  { name: 'CS1',      dscp: 8,  ipp: 1, cos: 1, cat: 'bulk', drop: 'N/A',  use: 'Scavenger / Background / Peer-to-peer / Bulk transfer' },
+  { name: 'AF11',     dscp: 10, ipp: 1, cos: 1, cat: 'bulk', drop: 'Low',  use: 'Assured Forwarding 1 (Low Drop) - High priority bulk' },
+  { name: 'AF12',     dscp: 12, ipp: 1, cos: 1, cat: 'bulk', drop: 'Med',  use: 'Assured Forwarding 1 (Medium Drop)' },
+  { name: 'AF13',     dscp: 14, ipp: 1, cos: 1, cat: 'bulk', drop: 'High', use: 'Assured Forwarding 1 (High Drop)' },
+  { name: 'CS2',      dscp: 16, ipp: 2, cos: 2, cat: 'control', drop: 'N/A', use: 'OAM & Operations / Network Management (SNMP, SSH, Syslog)' },
+  { name: 'AF21',     dscp: 18, ipp: 2, cos: 2, cat: 'data', drop: 'Low',  use: 'Transactional Data / Low Drop (ERP, CRM, SQL database)' },
+  { name: 'AF22',     dscp: 20, ipp: 2, cos: 2, cat: 'data', drop: 'Med',  use: 'Transactional Data / Medium Drop' },
+  { name: 'AF23',     dscp: 22, ipp: 2, cos: 2, cat: 'data', drop: 'High', use: 'Transactional Data / High Drop' },
+  { name: 'CS3',      dscp: 24, ipp: 3, cos: 3, cat: 'voice', drop: 'N/A', use: 'Call Signaling (SIP, H.323, SCCP / Skinny)' },
+  { name: 'AF31',     dscp: 26, ipp: 3, cos: 3, cat: 'data', drop: 'Low',  use: 'Mission-Critical Data (Virtual Desktop / VDI, Citrix)' },
+  { name: 'AF32',     dscp: 28, ipp: 3, cos: 3, cat: 'data', drop: 'Med',  use: 'Mission-Critical Data / Medium Drop' },
+  { name: 'AF33',     dscp: 30, ipp: 3, cos: 3, cat: 'data', drop: 'High', use: 'Mission-Critical Data / High Drop' },
+  { name: 'CS4',      dscp: 32, ipp: 4, cos: 4, cat: 'voice', drop: 'N/A', use: 'Real-Time Interactive Video / Telepresence' },
+  { name: 'AF41',     dscp: 34, ipp: 4, cos: 4, cat: 'voice', drop: 'Low',  use: 'Multimedia Conferencing / Low Drop (Zoom, Teams, Webex)' },
+  { name: 'AF42',     dscp: 36, ipp: 4, cos: 4, cat: 'voice', drop: 'Med',  use: 'Multimedia Conferencing / Medium Drop' },
+  { name: 'AF43',     dscp: 38, ipp: 4, cos: 4, cat: 'voice', drop: 'High', use: 'Multimedia Conferencing / High Drop' },
+  { name: 'CS5',      dscp: 40, ipp: 5, cos: 5, cat: 'voice', drop: 'N/A', use: 'Broadcast Video / IPTV streaming' },
+  { name: 'VA',       dscp: 44, ipp: 5, cos: 5, cat: 'voice', drop: 'N/A', use: 'Voice-Admit / CAC Admission Controlled VoIP' },
+  { name: 'EF',       dscp: 46, ipp: 5, cos: 5, cat: 'voice', drop: 'N/A', use: 'Expedited Forwarding / Telephony Voice RTP (Low latency <10ms)' },
+  { name: 'CS6',      dscp: 48, ipp: 6, cos: 6, cat: 'control', drop: 'N/A', use: 'Network Routing Control (BGP, OSPF, EIGRP, ISIS)' },
+  { name: 'CS7',      dscp: 56, ipp: 7, cos: 7, cat: 'control', drop: 'N/A', use: 'Critical Network Control / STP / Bridge PDUs' }
+];
+
+function onSelectDSCP(val) {
+  document.getElementById('qos-in').value = val;
+  renderQoS(parseInt(val, 10));
+}
+
+function onInputQoS(inputStr) {
+  inputStr = inputStr.trim().toUpperCase();
+  if (!inputStr) return;
+  // Check if matches known name (e.g. EF, AF41, CS3)
+  const found = DSCP_DATABASE.find(d => d.name.toUpperCase().startsWith(inputStr) || d.name.toUpperCase().replace(/\s/g,'').includes(inputStr));
+  let dscpVal;
+  if (found && !inputStr.startsWith('0X') && isNaN(inputStr)) {
+    dscpVal = found.dscp;
+  } else if (inputStr.startsWith('0X')) {
+    const hexVal = parseInt(inputStr, 16);
+    // If hex > 63, treat as ToS byte (dscp = tos >> 2)
+    dscpVal = hexVal > 63 ? (hexVal >> 2) : hexVal;
+  } else {
+    const num = parseInt(inputStr, 10);
+    if (isNaN(num)) return;
+    dscpVal = num > 63 ? (num >> 2) : num;
+  }
+  if (dscpVal < 0 || dscpVal > 63) return;
+  const sel = document.getElementById('qos-select');
+  if (sel) {
+    const opt = Array.from(sel.options).find(o => parseInt(o.value, 10) === dscpVal);
+    if (opt) sel.value = dscpVal;
+  }
+  renderQoS(dscpVal);
+}
+
+function renderQoS(dscp) {
+  const tosByte = (dscp << 2);
+  const tosHex = '0x' + tosByte.toString(16).toUpperCase().padStart(2, '0');
+  const dscpHex = '0x' + dscp.toString(16).toUpperCase().padStart(2, '0');
+  const bin6 = dscp.toString(2).padStart(6, '0');
+  const bin8 = (tosByte).toString(2).padStart(8, '0');
+  const ipp = dscp >> 3;
+  const cos = ipp; // Recommended 802.1p CoS mapping
+
+  const known = DSCP_DATABASE.find(d => d.dscp === dscp);
+  const name = known ? known.name : `Custom (${dscp})`;
+  const use = known ? known.use : 'Custom / Unstandardized Code Point';
+  const dropProb = known ? known.drop : 'N/A';
+
+  // Render 8-bit visual bar
+  let bitsHtml = '';
+  for (let i = 0; i < 6; i++) {
+    const bitVal = bin6[i];
+    bitsHtml += `<div style="flex:1;background:var(--accent2);color:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:3px;font-weight:700">
+      <span style="font-size:10px">D${5 - i}</span>
+      <span style="font-size:11px">${bitVal}</span>
+    </div>`;
+  }
+  for (let i = 0; i < 2; i++) {
+    bitsHtml += `<div style="flex:1;background:var(--border2);color:var(--text3);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:3px;font-weight:500">
+      <span style="font-size:9px">ECN${1 - i}</span>
+      <span style="font-size:11px">0</span>
+    </div>`;
+  }
+  document.getElementById('qos-bit-bar').innerHTML = bitsHtml;
+
+  const dropColor = dropProb === 'Low' ? 'var(--success)' : dropProb === 'Med' ? 'var(--warning)' : dropProb === 'High' ? 'var(--danger)' : 'var(--text3)';
+
+  document.getElementById('qos-result').innerHTML = `
+    <div class="info-grid">
+      ${pill('Standard PHB', name, 'var(--accent)')}
+      ${pill('DSCP (Dec / Hex)', `${dscp} (${dscpHex})`, 'var(--accent2)')}
+      ${pill('DSCP Binary', bin6)}
+      ${pill(t('tosByte'), `${tosHex} (Dec: ${tosByte})`, 'var(--accent3)')}
+      ${pill(t('ipPrecedence'), `${ipp}`)}
+      ${pill(t('cos8021p'), `${cos}`, 'var(--success)')}
+      ${pill(t('dropProb'), dropProb, dropColor)}
+      ${pill('ToS Full Byte', bin8)}
+    </div>
+    <div style="margin-top:8px;padding:8px;background:var(--bg3);border-radius:var(--r);font-size:11px;color:var(--text2)">
+      💡 <b>${t('qosUse')}:</b> ${use}
+    </div>
+  `;
+}
+
+function renderQosTable(list) {
+  const tbody = document.getElementById('qos-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = list.map(item => {
+    const tos = '0x' + (item.dscp << 2).toString(16).toUpperCase().padStart(2, '0');
+    const dHex = '0x' + item.dscp.toString(16).toUpperCase().padStart(2, '0');
+    const isVoice = item.cat === 'voice';
+    const isControl = item.cat === 'control';
+    const nameColor = isVoice ? 'var(--accent)' : isControl ? 'var(--accent4)' : 'var(--text)';
+    return `<tr style="cursor:pointer" onclick="onSelectDSCP(${item.dscp})">
+      <td style="font-weight:600;color:${nameColor}">${item.name}</td>
+      <td style="color:var(--accent2)">${item.dscp}</td>
+      <td style="color:var(--text3)">${dHex}</td>
+      <td style="color:var(--accent3)">${tos}</td>
+      <td>${item.ipp}</td>
+      <td style="color:var(--success)">${item.cos}</td>
+      <td style="font-size:11px;color:var(--text3);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.use}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterQosTable(category, btn) {
+  document.getElementById('qos-search').value = '';
+  document.querySelectorAll('.btn-qos').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (!category) {
+    renderQosTable(DSCP_DATABASE);
+    return;
+  }
+  renderQosTable(DSCP_DATABASE.filter(d => d.cat === category));
+}
+
+function searchQosTable() {
+  const q = document.getElementById('qos-search').value.trim().toLowerCase();
+  document.querySelectorAll('.btn-qos').forEach(b => b.classList.remove('active'));
+  const allBtn = document.querySelector('.btn-qos[data-qos-cat=""]');
+  if (allBtn) allBtn.classList.add('active');
+  if (!q) { renderQosTable(DSCP_DATABASE); return; }
+  const filtered = DSCP_DATABASE.filter(d => 
+    d.name.toLowerCase().includes(q) || 
+    d.dscp.toString().includes(q) || 
+    d.use.toLowerCase().includes(q)
+  );
+  renderQosTable(filtered);
 }
 
 /* ============================================================
