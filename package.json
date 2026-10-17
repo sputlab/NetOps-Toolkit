@@ -1,6 +1,6 @@
 {
   "name": "netops-toolkit",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "Professional, offline-first network engineering & IT operations toolkit: Subnetting, VLSM, IPv6, QoS DSCP, Port reference, Bandwidth, Physical media, and Security.",
   "main": "index.html",
   "scripts": {

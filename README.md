@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.4.1-00d4aa.svg?style=flat-square" alt="Version 2.4.1">
+  <img src="https://img.shields.io/badge/version-2.4.2-00d4aa.svg?style=flat-square" alt="Version 2.4.2">
   <img src="https://img.shields.io/badge/PWA-Ready-0090ff.svg?style=flat-square" alt="PWA Ready">
   <img src="https://img.shields.io/badge/Offline-First-22c55e.svg?style=flat-square" alt="Offline First">
   <img src="https://img.shields.io/badge/Dependencies-Zero-a855f7.svg?style=flat-square" alt="Zero Dependencies">
@@ -126,11 +126,12 @@ NetOps Toolkit is fully configured as a Progressive Web App:
 ```
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml          # GitHub Pages automated deployment workflow
+│       ├── deploy.yml          # GitHub Pages automated deployment workflow
+│       └── release.yml         # Automated GitHub Release packager
 ├── .gitignore                  # Git ignore rules (OS, IDE, temporary files)
 ├── LICENSE                     # MIT License
 ├── README.md                   # Project documentation
-├── index.html                  # Main application entry point (v2.3.2)
+├── index.html                  # Main application entry point (v2.4.2)
 ├── netops_toolkit_232.html     # Direct version release snapshot
 ├── manifest.json               # Web App Manifest for PWA installation
 ├── sw.js                       # Service Worker for offline caching & network fallback
