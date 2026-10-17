@@ -4,7 +4,7 @@
  * Provides full offline PWA capabilities with stale-while-revalidate / cache-first strategies.
  */
 
-const CACHE_NAME = 'netops-toolkit-v2.4.1';
+const CACHE_NAME = 'netops-toolkit-v2.4.1-brand';
 const STATIC_ASSETS = [
   './',
   './index.html',

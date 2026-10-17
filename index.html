@@ -35,8 +35,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .header{background:linear-gradient(135deg,#0a0e1a 0%,#0d1829 50%,#091423 100%);border-bottom:1px solid var(--border);padding:0 1rem}
 .header-inner{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px;margin:0 auto;gap:10px}
 .logo{display:flex;align-items:center;gap:8px;min-width:0}
-.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo-icon svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2}
+.logo-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.5);background:#070c18}
+.logo-icon svg{width:100%;height:100%;display:block}
 .logo-text{font-size:15px;font-weight:700;letter-spacing:0.5px;color:var(--text);white-space:nowrap}
 .logo-sub{font-size:10px;color:var(--text2);font-family:var(--font-mono);letter-spacing:1px;text-transform:uppercase}
 .badge{background:var(--accent);color:#000;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;font-family:var(--font-mono);letter-spacing:0.5px;white-space:nowrap}
@@ -152,7 +152,52 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
     <div class="header-inner">
       <div class="logo">
         <div class="logo-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 7h12M6 11h8" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+  <defs>
+    <linearGradient id="brandBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070c18"/>
+      <stop offset="50%" stop-color="#0f192f"/>
+      <stop offset="100%" stop-color="#080f1e"/>
+    </linearGradient>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0c0"/>
+      <stop offset="35%" stop-color="#00d4aa"/>
+      <stop offset="70%" stop-color="#0090ff"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <filter id="brandGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#brandBg)"/>
+  <rect x="5" y="5" width="502" height="502" rx="111" fill="none" stroke="#1e3252" stroke-width="6" opacity="0.8"/>
+  <g stroke="#00d4aa" stroke-width="2.5" stroke-dasharray="4,6" fill="none" opacity="0.3">
+    <circle cx="256" cy="256" r="190"/>
+    <circle cx="256" cy="256" r="115"/>
+    <line x1="66" y1="256" x2="446" y2="256"/>
+    <line x1="256" y1="66" x2="256" y2="446"/>
+  </g>
+  <path d="M 148 140 L 148 372" stroke="#162640" stroke-width="52" stroke-linecap="round"/>
+  <path d="M 364 140 L 364 372" stroke="#162640" stroke-width="52" stroke-linecap="round"/>
+  <path d="M 148 140 L 364 372" stroke="#162640" stroke-width="52" stroke-linecap="round"/>
+  <g filter="url(#brandGlow)">
+    <path d="M 148 140 L 148 372" stroke="url(#brandGrad)" stroke-width="38" stroke-linecap="round"/>
+    <path d="M 148 140 L 364 372" stroke="url(#brandGrad)" stroke-width="38" stroke-linecap="round"/>
+    <path d="M 364 140 L 364 372" stroke="url(#brandGrad)" stroke-width="38" stroke-linecap="round"/>
+  </g>
+  <path d="M 148 372 L 148 140 L 364 372 L 364 140" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+  <circle cx="148" cy="140" r="18" fill="#00f0c0"/>
+  <circle cx="148" cy="140" r="9" fill="#ffffff"/>
+  <circle cx="148" cy="372" r="16" fill="#00d4aa"/>
+  <circle cx="148" cy="372" r="7" fill="#ffffff"/>
+  <circle cx="364" cy="140" r="16" fill="#38bdf8"/>
+  <circle cx="364" cy="140" r="7" fill="#ffffff"/>
+  <circle cx="364" cy="372" r="18" fill="#0090ff"/>
+  <circle cx="364" cy="372" r="9" fill="#ffffff"/>
+  <circle cx="256" cy="256" r="16" fill="#00d4aa" opacity="0.9"/>
+  <circle cx="256" cy="256" r="8" fill="#ffffff"/>
+</svg>
         </div>
         <div>
           <div class="logo-text">NetOps Toolkit</div>
@@ -929,7 +974,52 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
     <div class="modal-header">
       <div style="display:flex;align-items:center;gap:10px">
         <div class="logo-icon" style="width:34px;height:34px">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 7h12M6 11h8" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+  <defs>
+    <linearGradient id="brandBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070c18"/>
+      <stop offset="50%" stop-color="#0f192f"/>
+      <stop offset="100%" stop-color="#080f1e"/>
+    </linearGradient>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0c0"/>
+      <stop offset="35%" stop-color="#00d4aa"/>
+      <stop offset="70%" stop-color="#0090ff"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <filter id="brandGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#brandBg)"/>
+  <rect x="5" y="5" width="502" height="502" rx="111" fill="none" stroke="#1e3252" stroke-width="6" opacity="0.8"/>
+  <g stroke="#00d4aa" stroke-width="2.5" stroke-dasharray="4,6" fill="none" opacity="0.3">
+    <circle cx="256" cy="256" r="190"/>
+    <circle cx="256" cy="256" r="115"/>
+    <line x1="66" y1="256" x2="446" y2="256"/>
+    <line x1="256" y1="66" x2="256" y2="446"/>
+  </g>
+  <path d="M 148 140 L 148 372" stroke="#162640" stroke-width="52" stroke-linecap="round"/>
+  <path d="M 364 140 L 364 372" stroke="#162640" stroke-width="52" stroke-linecap="round"/>
+  <path d="M 148 140 L 364 372" stroke="#162640" stroke-width="52" stroke-linecap="round"/>
+  <g filter="url(#brandGlow)">
+    <path d="M 148 140 L 148 372" stroke="url(#brandGrad)" stroke-width="38" stroke-linecap="round"/>
+    <path d="M 148 140 L 364 372" stroke="url(#brandGrad)" stroke-width="38" stroke-linecap="round"/>
+    <path d="M 364 140 L 364 372" stroke="url(#brandGrad)" stroke-width="38" stroke-linecap="round"/>
+  </g>
+  <path d="M 148 372 L 148 140 L 364 372 L 364 140" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+  <circle cx="148" cy="140" r="18" fill="#00f0c0"/>
+  <circle cx="148" cy="140" r="9" fill="#ffffff"/>
+  <circle cx="148" cy="372" r="16" fill="#00d4aa"/>
+  <circle cx="148" cy="372" r="7" fill="#ffffff"/>
+  <circle cx="364" cy="140" r="16" fill="#38bdf8"/>
+  <circle cx="364" cy="140" r="7" fill="#ffffff"/>
+  <circle cx="364" cy="372" r="18" fill="#0090ff"/>
+  <circle cx="364" cy="372" r="9" fill="#ffffff"/>
+  <circle cx="256" cy="256" r="16" fill="#00d4aa" opacity="0.9"/>
+  <circle cx="256" cy="256" r="8" fill="#ffffff"/>
+</svg>
         </div>
         <div>
           <div id="about-modal-title" style="font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px">

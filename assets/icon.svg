@@ -1,45 +1,122 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
+    <!-- Background Gradient -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0a0e1a" />
-      <stop offset="50%" stop-color="#141c2e" />
-      <stop offset="100%" stop-color="#091423" />
+      <stop offset="0%" stop-color="#070c18" />
+      <stop offset="50%" stop-color="#0f192f" />
+      <stop offset="100%" stop-color="#080f1e" />
     </linearGradient>
-    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00d4aa" />
-      <stop offset="100%" stop-color="#0090ff" />
+
+    <!-- Main Emblem Electric Gradient -->
+    <linearGradient id="netopsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0c0" />
+      <stop offset="35%" stop-color="#00d4aa" />
+      <stop offset="70%" stop-color="#0090ff" />
+      <stop offset="100%" stop-color="#38bdf8" />
     </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="8" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+
+    <!-- Subtle Circuit Trace Gradient -->
+    <linearGradient id="traceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d4aa" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#0090ff" stop-opacity="0.1" />
+    </linearGradient>
+
+    <!-- Outer Glow -->
+    <filter id="coreGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur1" />
+      <feGaussianBlur stdDeviation="24" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Beacon Pulse Filter -->
+    <filter id="beaconGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
     </filter>
   </defs>
 
-  <!-- Background with subtle border -->
-  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
-  <rect x="4" y="4" width="504" height="504" rx="108" fill="none" stroke="#1e3050" stroke-width="8" opacity="0.6" />
+  <!-- 1. Squircle Container with Precision Rim -->
+  <rect width="512" height="512" rx="116" fill="url(#bgGrad)" />
+  <rect x="5" y="5" width="502" height="502" rx="111" fill="none" stroke="#1e3252" stroke-width="6" opacity="0.8" />
+  <rect x="8" y="8" width="496" height="496" rx="108" fill="none" stroke="#00d4aa" stroke-width="2" opacity="0.25" />
 
-  <!-- Network Nodes & Connecting Grid -->
-  <g stroke="#1e3050" stroke-width="4" stroke-dasharray="6,6">
-    <line x1="128" y1="128" x2="384" y2="128" />
-    <line x1="128" y1="384" x2="384" y2="384" />
-    <line x1="128" y1="128" x2="128" y2="384" />
-    <line x1="384" y1="128" x2="384" y2="384" />
+  <!-- 2. Futuristic Network Grid Topology (Telemetry Traces) -->
+  <g stroke="url(#traceGrad)" stroke-width="2.5" stroke-dasharray="4,6" fill="none">
+    <!-- Concentric Topology Rings -->
+    <circle cx="256" cy="256" r="190" opacity="0.4" />
+    <circle cx="256" cy="256" r="115" opacity="0.5" />
+    
+    <!-- Coordinate Crosshairs & Traces -->
+    <line x1="66" y1="256" x2="446" y2="256" opacity="0.3" />
+    <line x1="256" y1="66" x2="256" y2="446" opacity="0.3" />
+    <line x1="148" y1="140" x2="364" y2="372" opacity="0.4" stroke-dasharray="none" stroke-width="1.5" />
+    <line x1="148" y1="372" x2="364" y2="140" opacity="0.2" />
   </g>
 
-  <!-- Corner Mini Nodes -->
-  <circle cx="128" cy="128" r="8" fill="#1e3050" />
-  <circle cx="384" cy="128" r="8" fill="#1e3050" />
-  <circle cx="128" cy="384" r="8" fill="#1e3050" />
-  <circle cx="384" cy="384" r="8" fill="#1e3050" />
+  <!-- Peripheral Routing Satellite Nodes -->
+  <circle cx="256" cy="66" r="5" fill="#00d4aa" opacity="0.6" />
+  <circle cx="256" cy="446" r="5" fill="#0090ff" opacity="0.6" />
+  <circle cx="66" cy="256" r="5" fill="#00d4aa" opacity="0.6" />
+  <circle cx="446" cy="256" r="5" fill="#0090ff" opacity="0.6" />
 
-  <!-- Main 'N' Emblem with Glowing Circuit Lines -->
-  <path d="M 160 370 L 160 142 L 210 142 L 302 300 L 302 142 L 352 142 L 352 370 L 302 370 L 210 212 L 210 370 Z" 
-        fill="url(#accentGrad)" 
-        filter="url(#glow)" />
+  <!-- 3. Primary Iconic "N" Network Topology Monogram -->
+  <!-- Left Pillar Track -->
+  <path d="M 148 140 L 148 372" stroke="#162640" stroke-width="52" stroke-linecap="round" />
+  <!-- Right Pillar Track -->
+  <path d="M 364 140 L 364 372" stroke="#162640" stroke-width="52" stroke-linecap="round" />
+  <!-- Diagonal Data Conduit Track -->
+  <path d="M 148 140 L 364 372" stroke="#162640" stroke-width="52" stroke-linecap="round" />
 
-  <!-- Active Network Pulse Dots -->
-  <circle cx="160" cy="142" r="10" fill="#00d4aa" />
-  <circle cx="352" cy="370" r="10" fill="#0090ff" />
-  <circle cx="256" cy="256" r="6" fill="#ffffff" />
+  <!-- Glowing Foreground Conduit Pipeline -->
+  <g filter="url(#coreGlow)">
+    <!-- Left Vertical Rail -->
+    <path d="M 148 140 L 148 372" stroke="url(#netopsGrad)" stroke-width="38" stroke-linecap="round" />
+    <!-- Diagonal Interconnect Bridge -->
+    <path d="M 148 140 L 364 372" stroke="url(#netopsGrad)" stroke-width="38" stroke-linecap="round" />
+    <!-- Right Vertical Rail -->
+    <path d="M 364 140 L 364 372" stroke="url(#netopsGrad)" stroke-width="38" stroke-linecap="round" />
+  </g>
+
+  <!-- Inner High-Velocity Light Stream (Core Core Line) -->
+  <path d="M 148 372 L 148 140 L 364 372 L 364 140" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.85" />
+
+  <!-- 4. Network Gateway Nodes (Apex Routers) -->
+  <!-- Node Top-Left (Ingress Gateway) -->
+  <g filter="url(#beaconGlow)">
+    <circle cx="148" cy="140" r="18" fill="#00f0c0" />
+    <circle cx="148" cy="140" r="9" fill="#ffffff" />
+  </g>
+
+  <!-- Node Bottom-Left -->
+  <g filter="url(#beaconGlow)">
+    <circle cx="148" cy="372" r="16" fill="#00d4aa" />
+    <circle cx="148" cy="372" r="7" fill="#ffffff" />
+  </g>
+
+  <!-- Node Top-Right -->
+  <g filter="url(#beaconGlow)">
+    <circle cx="364" cy="140" r="16" fill="#38bdf8" />
+    <circle cx="364" cy="140" r="7" fill="#ffffff" />
+  </g>
+
+  <!-- Node Bottom-Right (Egress Gateway) -->
+  <g filter="url(#beaconGlow)">
+    <circle cx="364" cy="372" r="18" fill="#0090ff" />
+    <circle cx="364" cy="372" r="9" fill="#ffffff" />
+  </g>
+
+  <!-- Central Switch Matrix Hub (Center Pulse Beacon) -->
+  <g filter="url(#beaconGlow)">
+    <circle cx="256" cy="256" r="16" fill="#00d4aa" opacity="0.9" />
+    <circle cx="256" cy="256" r="8" fill="#ffffff" />
+    <polygon points="256,242 260,256 256,270 252,256" fill="#070c18" />
+    <polygon points="242,256 256,260 270,256 256,252" fill="#070c18" />
+  </g>
 </svg>
