@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NetOps Toolkit v2.4.0</title>
+<title>NetOps Toolkit v2.4.1</title>
 <meta name="description" content="Professional network toolkit: subnet calculator, VLSM, IP tools, ports, bandwidth, Wi-Fi, security. Works offline as PWA.">
 <meta name="theme-color" content="#0a0e1a">
 <link rel="manifest" href="manifest.json">
@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NetOps">
-<meta property="og:title" content="NetOps Toolkit v2.4.0">
+<meta property="og:title" content="NetOps Toolkit v2.4.1">
 <meta property="og:description" content="Professional network toolkit: subnet calculator, VLSM, IP tools, ports, bandwidth, Wi-Fi, security. Works offline as PWA.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="assets/icon-512.png">
@@ -31,7 +31,8 @@
   --r:8px;--r2:12px;
 }
 body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
-.header{background:linear-gradient(135deg,#0a0e1a 0%,#0d1829 50%,#091423 100%);border-bottom:1px solid var(--border);padding:0 1rem;position:sticky;top:0;z-index:100}
+.top-nav-sticky{position:sticky;top:0;z-index:100;background:var(--bg);box-shadow:0 4px 16px rgba(0,0,0,0.45)}
+.header{background:linear-gradient(135deg,#0a0e1a 0%,#0d1829 50%,#091423 100%);border-bottom:1px solid var(--border);padding:0 1rem}
 .header-inner{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px;margin:0 auto;gap:10px}
 .logo{display:flex;align-items:center;gap:8px;min-width:0}
 .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -43,9 +44,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .lang-btn{background:transparent;border:1px solid var(--border2);color:var(--text3);font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:0.5px}
 .lang-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
 .lang-btn:hover:not(.active){background:var(--bg3);color:var(--text)}
-.nav-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:var(--bg2);border-bottom:1px solid var(--border)}
+.nav-container{position:relative;background:var(--bg2);border-bottom:1px solid var(--border);max-width:100%;display:flex;align-items:center}
+.nav-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;width:100%}
 .nav-scroll::-webkit-scrollbar{display:none}
-.nav-tabs{display:flex;padding:0 1rem;max-width:900px;margin:0 auto;gap:0}
+.nav-tabs{display:flex;padding:0 1.25rem;max-width:900px;margin:0 auto;gap:0}
+.nav-arrow{display:none;position:absolute;top:0;bottom:0;width:32px;background:var(--bg2);border:none;color:var(--accent);align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:opacity .2s,visibility .2s;padding:0}
+.nav-arrow-left{left:0;background:linear-gradient(90deg,var(--bg2) 65%,transparent);padding-right:6px}
+.nav-arrow-right{right:0;background:linear-gradient(-90deg,var(--bg2) 65%,transparent);padding-left:6px}
+@keyframes hintBounceLeft{0%,100%{transform:translateX(0);opacity:0.6}50%{transform:translateX(-4px);opacity:1}}
+@keyframes hintBounceRight{0%,100%{transform:translateX(0);opacity:0.6}50%{transform:translateX(4px);opacity:1}}
+.nav-arrow-left svg{animation:hintBounceLeft 1.2s ease-in-out infinite}
+.nav-arrow-right svg{animation:hintBounceRight 1.2s ease-in-out infinite}
+.nav-arrow.hidden{opacity:0;visibility:hidden;pointer-events:none}
+@media(max-width:820px){.nav-arrow{display:flex}}
 .tab-btn{flex-shrink:0;padding:10px 14px;font-family:var(--font);font-size:12px;font-weight:500;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;letter-spacing:0.3px}
 .tab-btn:hover{color:var(--text2)}
 .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
@@ -119,29 +130,35 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
 </head>
 <body>
 
-<div class="header">
-  <div class="header-inner">
-    <div class="logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 7h12M6 11h8" stroke-linecap="round"/></svg>
+<div class="top-nav-sticky">
+  <div class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 7h12M6 11h8" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="logo-text">NetOps Toolkit</div>
+          <div class="logo-sub" data-i18n="logoSub">Network &amp; IT Tools</div>
+        </div>
       </div>
-      <div>
-        <div class="logo-text">NetOps Toolkit</div>
-        <div class="logo-sub" data-i18n="logoSub">Network &amp; IT Tools</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="lang-switch" role="group" aria-label="Language selector">
+          <button class="lang-btn active" onclick="setLang('it')" id="lang-it">IT</button>
+          <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
+        </div>
+        <span class="badge">v2.4.1</span>
       </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <div class="lang-switch" role="group" aria-label="Language selector">
-        <button class="lang-btn active" onclick="setLang('it')" id="lang-it">IT</button>
-        <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
-      </div>
-      <span class="badge">v2.4.0</span>
     </div>
   </div>
-</div>
 
-<div class="nav-scroll">
-  <div class="nav-tabs">
+  <div class="nav-container">
+    <button class="nav-arrow nav-arrow-left hidden" id="nav-arrow-left" onclick="scrollNav(-160)" aria-label="Scroll tabs left">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+
+    <div class="nav-scroll" id="nav-scroll" onscroll="updateNavArrows()">
+      <div class="nav-tabs">
     <button class="tab-btn active" onclick="showTab('subnet')" id="tab-subnet">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v4m0 0-4 6m4-6 4 6"/></svg>
       <span data-i18n="tabSubnet">Subnet / VLSM</span>
@@ -175,7 +192,13 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
       <span data-i18n="tabCrypto">Sicurezza</span>
     </button>
   </div>
-</div>
+    </div>
+
+    <button class="nav-arrow nav-arrow-right" id="nav-arrow-right" onclick="scrollNav(160)" aria-label="Scroll tabs right">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+  </div>
+</div><!-- end top-nav-sticky -->
 
 <div class="main">
 
@@ -192,7 +215,7 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
       </div>
       <div>
         <label for="sn-cidr" data-i18n="cidrMask">CIDR / Maschera</label>
-        <input type="text" id="sn-cidr" value="24" placeholder="/24 o 255.255.255.0">
+        <input type="text" id="sn-cidr" data-i18n-placeholder="snCidrPlaceholder" value="24" placeholder="/24 o 255.255.255.0">
       </div>
     </div>
     <button class="btn btn-primary btn-full" onclick="calcSubnet()" data-i18n="calculate">Calcola ▶</button>
@@ -221,7 +244,7 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
     <div class="input-row">
       <div>
         <label for="vsn-new" data-i18n="newMask">Nuova Maschera</label>
-        <input type="text" id="vsn-new" value="12" placeholder="es. 12">
+        <input type="text" id="vsn-new" data-i18n-placeholder="vsnNewPlaceholder" value="12" placeholder="es. 12">
       </div>
       <div style="display:flex;align-items:flex-end">
         <button class="btn btn-primary btn-full" onclick="splitSubnet()" data-i18n="split">Dividi</button>
@@ -270,7 +293,7 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
     <div class="input-row full">
       <div>
         <label for="ip-check" data-i18n="ipAddress">Indirizzo IP</label>
-        <input type="text" id="ip-check" placeholder="es. 10.0.0.1 oppure ::1" value="192.168.1.254">
+        <input type="text" id="ip-check" data-i18n-placeholder="ipCheckPlaceholder" placeholder="es. 10.0.0.1 oppure ::1" value="192.168.1.254">
       </div>
     </div>
     <button class="btn btn-primary btn-full" onclick="checkIP()" data-i18n="analyze">Analizza</button>
@@ -400,7 +423,7 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
     <div class="input-row full">
       <div>
         <label for="v6exp-in" data-i18n="ipv6Input">Indirizzo IPv6</label>
-        <input type="text" id="v6exp-in" value="2001:db8::1" placeholder="es. 2001:db8::1" oninput="processIPv6Format()">
+        <input type="text" id="v6exp-in" data-i18n-placeholder="v6expPlaceholder" value="2001:db8::1" placeholder="es. 2001:db8::1" oninput="processIPv6Format()">
       </div>
     </div>
     <div id="v6exp-result" style="margin-top:8px"></div>
@@ -432,7 +455,7 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
 
   <div class="card">
     <div class="card-title"><span class="dot dot-blue"></span><span data-i18n="searchPortTitle">Cerca porta o protocollo</span></div>
-    <input type="text" id="port-search" placeholder="es. 80, http, ftp, 443..." oninput="searchPorts()">
+    <input type="text" id="port-search" data-i18n-placeholder="searchPortPlaceholder" placeholder="es. 80, http, ftp, 443..." oninput="searchPorts()">
     <div id="port-results" style="max-height:500px;overflow-y:auto;margin-top:8px"></div>
   </div>
 </div>
@@ -571,7 +594,7 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
     <div class="input-row full">
       <div>
         <label for="enc-in" data-i18n="textInput">Testo / Input</label>
-        <input type="text" id="enc-in" value="NetOps" placeholder="Inserisci testo..." oninput="encodeAll()">
+        <input type="text" id="enc-in" data-i18n-placeholder="textInputPlaceholder" value="NetOps" placeholder="Inserisci testo..." oninput="encodeAll()">
       </div>
     </div>
     <div id="enc-result"></div>
@@ -608,7 +631,7 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
       </div>
       <div>
         <label for="qos-in" data-i18n="dscpCustom">Valore DSCP (0–63) o ToS (Hex/Dec)</label>
-        <input type="text" id="qos-in" value="46" placeholder="es. 46, EF, 0xB8" oninput="onInputQoS(this.value)">
+        <input type="text" id="qos-in" data-i18n-placeholder="qosInPlaceholder" value="46" placeholder="es. 46, EF, 0xB8" oninput="onInputQoS(this.value)">
       </div>
     </div>
 
@@ -632,7 +655,7 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
         <button class="btn btn-ghost btn-sm btn-qos" data-qos-cat="control" onclick="filterQosTable('control',this)" data-i18n="dscpFilterControl">Controllo Rete</button>
         <button class="btn btn-ghost btn-sm btn-qos" data-qos-cat="bulk" onclick="filterQosTable('bulk',this)" data-i18n="dscpFilterBulk">Best Effort / Bulk</button>
       </div>
-      <input type="text" id="qos-search" placeholder="Cerca classe QoS..." oninput="searchQosTable()" style="margin-bottom:8px">
+      <input type="text" id="qos-search" data-i18n-placeholder="searchDscp" placeholder="Cerca classe QoS o DSCP..." oninput="searchQosTable()" style="margin-bottom:8px">
       <div class="table-scroll" style="max-height:260px;overflow-y:auto">
         <table class="result-table">
           <thead>
@@ -839,7 +862,7 @@ input[type=range]{padding:0;margin:8px 0;background:transparent;border:none;acce
     <div class="input-row full">
       <div>
         <label for="hash-in" data-i18n="hashText">Testo da hashare</label>
-        <input type="text" id="hash-in" value="Hello Network" placeholder="Inserisci testo...">
+        <input type="text" id="hash-in" data-i18n-placeholder="textInputPlaceholder" value="Hello Network" placeholder="Inserisci testo...">
       </div>
     </div>
     <button class="btn btn-primary btn-full" onclick="generateHash()" data-i18n="genHash">Genera Hash ▶</button>
@@ -1010,6 +1033,13 @@ const i18n = {
     dscpFilterControl: "Controllo Rete",
     dscpFilterBulk: "Best Effort / Bulk",
     searchDscp: "Cerca classe QoS o DSCP...",
+    searchPortPlaceholder: "es. 80, http, ftp, 443...",
+    snCidrPlaceholder: "/24 o 255.255.255.0",
+    vsnNewPlaceholder: "es. 12",
+    ipCheckPlaceholder: "es. 10.0.0.1 oppure ::1",
+    v6expPlaceholder: "es. 2001:db8::1",
+    textInputPlaceholder: "Inserisci testo...",
+    qosInPlaceholder: "es. 46, EF, 0xB8",
   },
   en: {
     logoSub:"Network & IT Tools", tabSubnet:"Subnet / VLSM", tabIPTools:"IP Tools", tabPorts:"Ports & Protocols",
@@ -1139,6 +1169,13 @@ const i18n = {
     dscpFilterControl: "Network Control",
     dscpFilterBulk: "Best Effort / Bulk",
     searchDscp: "Search QoS class or DSCP...",
+    searchPortPlaceholder: "e.g. 80, http, ftp, 443...",
+    snCidrPlaceholder: "/24 or 255.255.255.0",
+    vsnNewPlaceholder: "e.g. 12",
+    ipCheckPlaceholder: "e.g. 10.0.0.1 or ::1",
+    v6expPlaceholder: "e.g. 2001:db8::1",
+    textInputPlaceholder: "Enter text...",
+    qosInPlaceholder: "e.g. 46, EF, 0xB8",
   }
 };
 
@@ -1166,6 +1203,12 @@ function setLang(lang) {
       }
     } else {
       el.textContent = i18n[lang][key];
+    }
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (i18n[lang] && i18n[lang][key]) {
+      el.placeholder = i18n[lang][key];
     }
   });
   const pwaIn = document.getElementById('pwa-in');
@@ -1224,7 +1267,39 @@ function showTab(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.getElementById('tab-'+id).classList.add('active');
+  const btn = document.getElementById('tab-'+id);
+  if (btn) {
+    btn.classList.add('active');
+    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+}
+
+function scrollNav(amount) {
+  const el = document.getElementById('nav-scroll');
+  if (el) el.scrollBy({ left: amount, behavior: 'smooth' });
+}
+
+function updateNavArrows() {
+  const el = document.getElementById('nav-scroll');
+  const leftArrow = document.getElementById('nav-arrow-left');
+  const rightArrow = document.getElementById('nav-arrow-right');
+  if (!el || !leftArrow || !rightArrow) return;
+  const maxScroll = el.scrollWidth - el.clientWidth;
+  if (maxScroll <= 8) {
+    leftArrow.classList.add('hidden');
+    rightArrow.classList.add('hidden');
+    return;
+  }
+  if (el.scrollLeft > 10) {
+    leftArrow.classList.remove('hidden');
+  } else {
+    leftArrow.classList.add('hidden');
+  }
+  if (el.scrollLeft < maxScroll - 10) {
+    rightArrow.classList.remove('hidden');
+  } else {
+    rightArrow.classList.add('hidden');
+  }
 }
 
 function copyText(t){
@@ -2862,6 +2937,8 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('pwa-result').innerHTML=`<div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);padding:8px;background:var(--bg3);border-radius:var(--r);margin-top:8px">${t('pwaEmpty')}</div>`;
 
     setLang(currentLang);
+    updateNavArrows();
+    window.addEventListener('resize', updateNavArrows);
 
     // ==== Verifica post-inizializzazione ====
     if(!document.getElementById('bw-speed-label')){
