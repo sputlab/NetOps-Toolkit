@@ -1,0 +1,34 @@
+{
+  "name": "netops-toolkit",
+  "version": "2.4.1",
+  "description": "Professional, offline-first network engineering & IT operations toolkit: Subnetting, VLSM, IPv6, QoS DSCP, Port reference, Bandwidth, Physical media, and Security.",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "package": "node scripts/package.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sputlab/netops-toolkit.git"
+  },
+  "keywords": [
+    "network-tools",
+    "subnet-calculator",
+    "vlsm",
+    "ipv6",
+    "qos",
+    "dscp",
+    "port-lookup",
+    "bandwidth-calculator",
+    "pwa",
+    "offline-first",
+    "sysadmin",
+    "netops"
+  ],
+  "author": "sputlab",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sputlab/netops-toolkit/issues"
+  },
+  "homepage": "https://sputlab.github.io/netops-toolkit/"
+}

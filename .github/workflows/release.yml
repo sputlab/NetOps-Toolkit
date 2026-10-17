@@ -1,0 +1,65 @@
+name: Create GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for release (e.g. v2.4.1)'
+        required: false
+        default: 'v2.4.1'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build Package & Publish Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build Distribution Packages
+        run: |
+          node scripts/package.js
+
+      - name: Determine Tag Name
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag_name }}"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.tag }}
+          name: NetOps Toolkit ${{ steps.vars.outputs.tag }}
+          body: |
+            ### 🚀 NetOps Toolkit ${{ steps.vars.outputs.tag }}
+            
+            Professional, offline-first network engineering & IT operations toolkit.
+            
+            #### 📦 Download Assets:
+            - **`netops-toolkit-${{ steps.vars.outputs.tag }}.zip`**: Full WebApp distribution (including PWA manifest and offline service worker).
+            - **`netops-toolkit-standalone-${{ steps.vars.outputs.tag }}.html`**: Single-file portable edition (double-click to run anywhere without installation).
+            
+            #### 🌐 Live WebApp:
+            Access the web version anytime at [sputlab.github.io/netops-toolkit](https://sputlab.github.io/netops-toolkit/).
+          files: |
+            dist/*.zip
+            dist/*.html
+          generate_release_notes: true

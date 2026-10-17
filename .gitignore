@@ -35,3 +35,7 @@ Desktop.ini
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Build & distribution packages
+dist/
+node_modules/
