@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetOps Toolkit v2.1</title>
+<meta name="description" content="Professional network toolkit: subnet calculator, VLSM, IP tools, ports, bandwidth, Wi-Fi, security. Works offline as PWA.">
+<meta name="theme-color" content="#0a0e1a">
+<link rel="manifest" href='data:application/manifest+json,{"name":"NetOps Toolkit","short_name":"NetOps","start_url":".","display":"standalone","background_color":"%230a0e1a","theme_color":"%2300d4aa","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 192 192%27%3E%3Crect width=%27192%27 height=%27192%27 rx=%2732%27 fill=%27%2300d4aa%27/%3E%3Ctext x=%2796%27 y=%27125%27 font-size=%2796%27 text-anchor=%27middle%27 fill=%27%23000%27 font-family=%27monospace%27 font-weight=%27bold%27%3EN%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--bg2:#111827;--bg3:#1a2235;--bg4:#1e2d45;
+  --card:#141c2e;--card2:#192338;
+  --border:#1e3050;--border2:#2a4060;
+  --accent:#00d4aa;--accent2:#0090ff;--accent3:#ff6b35;--accent4:#a855f7;
+  --text:#e8f4ff;--text2:#8ba8c8;--text3:#4a6080;
+  --success:#22c55e;--warning:#f59e0b;--danger:#ef4444;
+  --font-mono:'JetBrains Mono',monospace;--font:'Space Grotesk',sans-serif;
+  --r:8px;--r2:12px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+
+.header{background:linear-gradient(135deg,#0a0e1a 0%,#0d1829 50%,#091423 100%);border-bottom:1px solid var(--border);padding:0 1rem;position:sticky;top:0;z-index:100}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px;margin:0 auto;gap:10px}
+.logo{display:flex;align-items:center;gap:8px;min-width:0}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-icon svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2}
+.logo-text{font-size:15px;font-weight:700;letter-spacing:0.5px;color:var(--text);white-space:nowrap}
+.logo-sub{font-size:10px;color:var(--text2);font-family:var(--font-mono);letter-spacing:1px;text-transform:uppercase}
+.badge{background:var(--accent);color:#000;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;font-family:var(--font-mono);letter-spacing:0.5px;white-space:nowrap}
+
+.lang-switch{display:flex;gap:4px;align-items:center;flex-shrink:0}
+.lang-btn{background:transparent;border:1px solid var(--border2);color:var(--text3);font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:0.5px}
+.lang-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+.lang-btn:hover:not(.active){background:var(--bg3);color:var(--text)}
+
+.nav-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:var(--bg2);border-bottom:1px solid var(--border)}
+.nav-scroll::-webkit-scrollbar{display:none}
+.nav-tabs{display:flex;padding:0 1rem;max-width:900px;margin:0 auto;gap:0}
+.tab-btn{flex-shrink:0;padding:10px 14px;font-family:var(--font);font-size:12px;font-weight:500;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;letter-spacing:0.3px}
+.tab-btn:hover{color:var(--text2)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn svg{width:14px;height:14px;flex-shrink:0}
+
+.main{max-width:900px;margin:0 auto;padding:1rem}
+.section{display:none}
+.section.active{display:block}
+
+.s-title{font-size:11px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.s-title::before{content:'';display:block;width:3px;height:14px;background:var(--accent);border-radius:2px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1rem;margin-bottom:1rem}
+.card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:0.75rem;display:flex;align-items:center;gap:8px}
+.card-title .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--success)}
+.dot-blue{background:var(--accent2)}
+.dot-orange{background:var(--accent3)}
+.dot-purple{background:var(--accent4)}
+.dot-teal{background:var(--accent)}
+
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.input-row.full{grid-template-columns:1fr}
+.input-row.three{grid-template-columns:1fr 1fr 1fr}
+label{font-size:11px;font-family:var(--font-mono);color:var(--text3);display:block;margin-bottom:4px;letter-spacing:0.5px;text-transform:uppercase}
+input,select,textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;color:var(--text);font-family:var(--font-mono);font-size:13px;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--bg3)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s;letter-spacing:0.3px}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:#00f0c0}
+.btn-primary:active{transform:scale(0.98)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-full{width:100%;justify-content:center;padding:10px}
+
+.result-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;font-family:var(--font-mono);font-size:12px;color:var(--accent);margin-top:8px;min-height:36px;word-break:break-all}
+.result-label{font-size:10px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px}
+
+.result-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:12px;margin-top:8px}
+.result-table th{background:var(--bg3);color:var(--text3);font-weight:500;padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);white-space:nowrap}
+.result-table td{padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap}
+.result-table tr:last-child td{border-bottom:none}
+.result-table tr:hover td{background:var(--bg3)}
+
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:0.875rem;cursor:pointer;transition:all .2s}
+.tool-card:hover{border-color:var(--accent);background:var(--card2)}
+
+.vlsm-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;margin-bottom:6px}
+.vlsm-row input{padding:6px 8px}
+
+.chip{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-family:var(--font-mono);font-weight:600}
+
+.terminal{background:#050a10;border:1px solid var(--border);border-radius:var(--r);padding:10px;font-family:var(--font-mono);font-size:12px;color:#4ade80;min-height:80px;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+
+.port-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);gap:8px}
+.port-num{font-family:var(--font-mono);font-size:12px;color:var(--accent2);font-weight:600;min-width:50px}
+.port-proto{font-size:10px;padding:1px 6px;border-radius:3px;font-family:var(--font-mono);font-weight:600;flex-shrink:0}
+.port-tcp{background:#0a1a2a;color:var(--accent2)}
+.port-udp{background:#0a2a1a;color:var(--success)}
+.port-both{background:#1a0a2a;color:var(--accent4)}
+.port-name{font-size:12px;color:var(--text);flex:1;margin:0 4px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.port-desc{font-size:10px;color:var(--text3);text-align:right;max-width:120px;line-height:1.3}
+
+.bw-slider{width:100%;margin:6px 0}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.info-pill{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0}
+.info-pill-label{font-size:10px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap}
+.info-pill-val{font-size:12px;color:var(--text);font-family:var(--font-mono);font-weight:500;overflow:hidden;text-overflow:ellipsis}
+
+.copy-btn{background:transparent;border:none;cursor:pointer;color:var(--text3);padding:2px 4px;font-size:14px;transition:color .2s;vertical-align:middle}
+.copy-btn:hover{color:var(--accent)}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+@media(min-width:600px){
+  .input-row{grid-template-columns:1fr 1fr 1fr}
+  .input-row.full{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 7h12M6 11h8" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div class="logo-text">NetOps Toolkit</div>
+        <div class="logo-sub" data-i18n="logoSub">Network &amp; IT Tools</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="lang-switch" role="group" aria-label="Language selector">
+        <button class="lang-btn active" onclick="setLang('it')" id="lang-it">IT</button>
+        <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
+      </div>
+      <span class="badge">v2.1</span>
+    </div>
+  </div>
+</div>
+
+<div class="nav-scroll">
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('subnet')" id="tab-subnet">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v4m0 0-4 6m4-6 4 6"/></svg>
+      <span data-i18n="tabSubnet">Subnet / VLSM</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('iptools')" id="tab-iptools">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span data-i18n="tabIPTools">IP Tools</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('ports')" id="tab-ports">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      <span data-i18n="tabPorts">Porte &amp; Protocolli</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('bandwidth')" id="tab-bandwidth">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span data-i18n="tabBandwidth">Bandwidth</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('converters')" id="tab-converters">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
+      <span data-i18n="tabConverters">Convertitori</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('cable')" id="tab-cable">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4m16 0h-4M6 12a6 6 0 0 0 12 0M6 12V8M18 12V8"/></svg>
+      <span data-i18n="tabCable">Cavi &amp; Fisica</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('wifi')" id="tab-wifi">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.5 8.5a15 15 0 0 1 21 0M5 12a11 11 0 0 1 14 0M8.5 15.5a7 7 0 0 1 7 0M12 19h.01"/></svg>
+      <span data-i18n="tabWifi">Wi-Fi</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('crypto')" id="tab-crypto">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span data-i18n="tabCrypto">Sicurezza</span>
+    </button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ===== SUBNET / VLSM ===== -->
+<div class="section active" id="subnet" role="tabpanel">
+  <div class="s-title" data-i18n="subnetTitle">Calcolatore Subnet IPv4 &amp; VLSM</div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-teal"></span><span data-i18n="singleSubnet">Calcolo Subnet Singola</span></div>
+    <div class="input-row">
+      <div>
+        <label for="sn-ip" data-i18n="ipAddress">Indirizzo IP</label>
+        <input type="text" id="sn-ip" value="192.168.1.0" placeholder="192.168.1.0">
+      </div>
+      <div>
+        <label for="sn-cidr" data-i18n="cidrMask">CIDR / Maschera</label>
+        <input type="text" id="sn-cidr" value="24" placeholder="/24 o 255.255.255.0">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="calcSubnet()" data-i18n="calculate">Calcola ▶</button>
+    <div id="sn-result" style="margin-top:10px;display:none">
+      <div class="info-grid" id="sn-grid"></div>
+      <div class="table-scroll"><table class="result-table" id="sn-table" style="margin-top:10px"></table></div>
+      <div style="margin-top:8px;display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="copySubnetResult()" data-i18n="copyAll">Copia tutto</button>
+        <button class="btn btn-ghost btn-sm" onclick="shareSubnet()" data-i18n="share">Condividi</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span><span data-i18n="splitTitle">Subnetting Visuale – Dividi Rete</span></div>
+    <div class="input-row">
+      <div>
+        <label for="vsn-net" data-i18n="baseNetwork">Rete Base</label>
+        <input type="text" id="vsn-net" value="10.0.0.0" placeholder="10.0.0.0">
+      </div>
+      <div>
+        <label for="vsn-cidr" data-i18n="baseCIDR">CIDR Base</label>
+        <input type="text" id="vsn-cidr" value="8" placeholder="8">
+      </div>
+    </div>
+    <div class="input-row">
+      <div>
+        <label for="vsn-new" data-i18n="newMask">Nuova Maschera</label>
+        <input type="text" id="vsn-new" value="12" placeholder="es. 12">
+      </div>
+      <div style="display:flex;align-items:flex-end">
+        <button class="btn btn-primary btn-full" onclick="splitSubnet()" data-i18n="split">Dividi</button>
+      </div>
+    </div>
+    <div id="vsn-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-orange"></span><span data-i18n="vlsmTitle">VLSM – Variable Length Subnet Mask</span></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px" data-i18n="vlsmHint">Inserisci il numero di host per ogni subnet. Le subnet saranno allocate in ordine decrescente.</div>
+    <div class="input-row full">
+      <div>
+        <label for="vlsm-net" data-i18n="startingNetwork">Rete di partenza (CIDR)</label>
+        <input type="text" id="vlsm-net" value="192.168.100.0/24" placeholder="192.168.100.0/24">
+      </div>
+    </div>
+    <div id="vlsm-subnets">
+      <div class="vlsm-row">
+        <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono)">#1</span>
+        <input type="number" placeholder="N° host" value="50" min="1">
+        <input type="text" placeholder="Nome" style="max-width:110px" value="LAN Office">
+        <button class="btn btn-ghost btn-sm" onclick="removeVlsmRow(this)" aria-label="Remove">✕</button>
+      </div>
+      <div class="vlsm-row">
+        <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono)">#2</span>
+        <input type="number" placeholder="N° host" value="20" min="1">
+        <input type="text" placeholder="Nome" style="max-width:110px" value="DMZ">
+        <button class="btn btn-ghost btn-sm" onclick="removeVlsmRow(this)" aria-label="Remove">✕</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-ghost" style="flex:1" onclick="addVlsmRow()" data-i18n="addSubnet">+ Subnet</button>
+      <button class="btn btn-primary" style="flex:1" onclick="calcVLSM()" data-i18n="calcVLSM">Calcola VLSM ▶</button>
+    </div>
+    <div id="vlsm-result"></div>
+  </div>
+</div>
+
+<!-- ===== IP TOOLS ===== -->
+<div class="section" id="iptools">
+  <div class="s-title" data-i18n="ipToolsTitle">Strumenti IP</div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-teal"></span><span data-i18n="checkIPTitle">Verifica IP (IPv4/IPv6)</span></div>
+    <div class="input-row full">
+      <div>
+        <label for="ip-check" data-i18n="ipAddress">Indirizzo IP</label>
+        <input type="text" id="ip-check" placeholder="es. 10.0.0.1 oppure ::1" value="192.168.1.254">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="checkIP()" data-i18n="analyze">Analizza</button>
+    <div id="ip-check-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span><span data-i18n="ipConverterTitle">Convertor IP ↔ Decimale ↔ Binario ↔ Hex</span></div>
+    <div>
+      <label for="ipc-ip" data-i18n="ipv4Address">Indirizzo IPv4</label>
+      <input type="text" id="ipc-ip" value="192.168.1.1" placeholder="192.168.1.1" oninput="convertIP()">
+    </div>
+    <div id="ipc-results" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-orange"></span><span data-i18n="wildcardTitle">Wildcard Mask</span></div>
+    <div class="input-row">
+      <div>
+        <label for="wc-mask" data-i18n="subnetMask">Subnet Mask</label>
+        <input type="text" id="wc-mask" value="255.255.255.0" placeholder="255.255.255.0" oninput="calcWildcard()">
+      </div>
+      <div>
+        <label data-i18n="wildcard">Wildcard</label>
+        <div class="result-box" id="wc-result" style="margin-top:0;padding-top:8px;padding-bottom:8px">0.0.0.255</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-purple"></span><span data-i18n="wildcardRangeTitle">Wildcard da Range IP (ACL)</span></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px" data-i18n="wildcardRangeHint">Inserisci IP iniziale e finale per ottenere le wildcard mask corrispondenti.</div>
+    <div class="input-row">
+      <div>
+        <label for="wr-start" data-i18n="startIP">IP Iniziale</label>
+        <input type="text" id="wr-start" value="192.168.1.10" oninput="calcWildcardRange()">
+      </div>
+      <div>
+        <label for="wr-end" data-i18n="endIP">IP Finale</label>
+        <input type="text" id="wr-end" value="192.168.1.47" oninput="calcWildcardRange()">
+      </div>
+    </div>
+    <div id="wr-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-teal"></span><span data-i18n="compareTitle">Confronto Reti – Sono nella stessa subnet?</span></div>
+    <div class="input-row">
+      <div>
+        <label for="cmp-ip1" data-i18n="ip1">IP 1</label>
+        <input type="text" id="cmp-ip1" value="192.168.1.10">
+      </div>
+      <div>
+        <label for="cmp-ip2" data-i18n="ip2">IP 2</label>
+        <input type="text" id="cmp-ip2" value="192.168.1.200">
+      </div>
+    </div>
+    <div class="input-row full">
+      <div>
+        <label for="cmp-mask" data-i18n="mask">Maschera</label>
+        <input type="text" id="cmp-mask" value="255.255.255.0">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="compareIPs()" data-i18n="check">Controlla</button>
+    <div id="cmp-result" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-orange"></span><span data-i18n="overlapTitle">Overlap Detector</span></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px" data-i18n="overlapHint">Verifica se due o più subnet si sovrappongono (una per riga, formato CIDR).</div>
+    <textarea id="ovl-in" rows="3" style="resize:vertical">192.168.1.0/25
+192.168.1.128/26
+192.168.1.192/26</textarea>
+    <button class="btn btn-primary btn-full" onclick="checkOverlap()" style="margin-top:8px" data-i18n="checkOverlap">Verifica Overlap ▶</button>
+    <div id="ovl-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-teal"></span><span data-i18n="rangeGenTitle">Generatore Range IP</span></div>
+    <div class="input-row">
+      <div>
+        <label for="range-net" data-i18n="networkCIDR">Rete CIDR</label>
+        <input type="text" id="range-net" value="192.168.10.0/26" placeholder="192.168.10.0/26">
+      </div>
+      <div style="display:flex;align-items:flex-end">
+        <button class="btn btn-primary btn-full" onclick="genRange()" data-i18n="generate">Genera</button>
+      </div>
+    </div>
+    <div id="range-result"></div>
+  </div>
+</div>
+
+<!-- ===== PORTS ===== -->
+<div class="section" id="ports">
+  <div class="s-title" data-i18n="portsTitle">Porte &amp; Protocolli</div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span><span data-i18n="searchPortTitle">Cerca porta o protocollo</span></div>
+    <input type="text" id="port-search" placeholder="es. 80, http, ftp, 443..." oninput="searchPorts()">
+    <div id="port-results" style="max-height:400px;overflow-y:auto;margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-orange"></span><span data-i18n="quickCat">Categorie rapide</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="btn btn-ghost btn-sm" onclick="filterCategory('web')">🌐 Web</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCategory('mail')">📧 Mail</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCategory('remote')">🖥️ <span data-i18n="remote">Remoto</span></button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCategory('db')">🗄️ Database</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCategory('dns')">🔍 DNS/DHCP</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCategory('voip')">📞 VoIP</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCategory('monitor')">📊 <span data-i18n="monitoring">Monitoraggio</span></button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCategory('')" data-i18n="all">Tutti</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BANDWIDTH ===== -->
+<div class="section" id="bandwidth">
+  <div class="s-title" data-i18n="bwTitle">Calcolo Bandwidth &amp; Trasferimento</div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-teal"></span><span data-i18n="transferTitle">Tempo di Trasferimento File</span></div>
+    <div class="input-row">
+      <div>
+        <label for="bw-size" data-i18n="fileSize">Dimensione File</label>
+        <input type="number" id="bw-size" value="1" min="0.001" step="0.1" oninput="calcTransfer()">
+      </div>
+      <div>
+        <label for="bw-unit" data-i18n="unit">Unità</label>
+        <select id="bw-unit" onchange="calcTransfer()">
+          <option value="1">MB</option>
+          <option value="1024">GB</option>
+          <option value="1048576">TB</option>
+          <option value="0.001">KB</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <label data-i18n="transferSpeed">Velocità di trasferimento: <span id="bw-speed-label" style="color:var(--accent)">100 Mbps</span></label>
+      <input type="range" class="bw-slider" id="bw-speed" min="1" max="10000" value="100" oninput="updateBWSlider();calcTransfer()">
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      <button class="btn btn-ghost btn-sm" onclick="setBW(10)">10 Mbps</button>
+      <button class="btn btn-ghost btn-sm" onclick="setBW(100)">100 Mbps</button>
+      <button class="btn btn-ghost btn-sm" onclick="setBW(1000)">1 Gbps</button>
+      <button class="btn btn-ghost btn-sm" onclick="setBW(10000)">10 Gbps</button>
+    </div>
+    <div class="info-grid" id="bw-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span><span data-i18n="throughputTitle">Throughput &amp; Utilizzo Linea</span></div>
+    <div class="input-row">
+      <div>
+        <label for="th-total" data-i18n="totalBW">Banda totale (Mbps)</label>
+        <input type="number" id="th-total" value="1000" oninput="calcThroughput()">
+      </div>
+      <div>
+        <label for="th-pct" data-i18n="usagePct">Utilizzo %</label>
+        <input type="number" id="th-pct" value="70" min="0" max="100" oninput="calcThroughput()">
+      </div>
+    </div>
+    <div id="th-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-orange"></span><span data-i18n="dataConvTitle">Convertor Unità Dati</span></div>
+    <div class="input-row">
+      <div>
+        <label for="du-val" data-i18n="value">Valore</label>
+        <input type="number" id="du-val" value="1" oninput="convertData()">
+      </div>
+      <div>
+        <label for="du-from" data-i18n="from">Da</label>
+        <select id="du-from" onchange="convertData()">
+          <option value="bit">bit</option>
+          <option value="byte">byte</option>
+          <option value="kb">Kilobit (kb)</option>
+          <option value="KB">Kilobyte (KB)</option>
+          <option value="mb">Megabit (Mb)</option>
+          <option value="MB" selected>Megabyte (MB)</option>
+          <option value="gb">Gigabit (Gb)</option>
+          <option value="GB">Gigabyte (GB)</option>
+          <option value="TB">Terabyte (TB)</option>
+        </select>
+      </div>
+    </div>
+    <div id="du-result"></div>
+  </div>
+</div>
+
+<!-- ===== CONVERTERS ===== -->
+<div class="section" id="converters">
+  <div class="s-title" data-i18n="convTitle">Convertitori</div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-teal"></span><span data-i18n="numConvTitle">Binario ↔ Decimale ↔ Esadecimale ↔ Ottale</span></div>
+    <div class="input-row">
+      <div>
+        <label for="conv-dec" data-i18n="decimal">Decimale</label>
+        <input type="number" id="conv-dec" placeholder="255" oninput="convertNum('dec')">
+      </div>
+      <div>
+        <label for="conv-bin" data-i18n="binary">Binario</label>
+        <input type="text" id="conv-bin" placeholder="11111111" oninput="convertNum('bin')">
+      </div>
+    </div>
+    <div class="input-row">
+      <div>
+        <label for="conv-hex" data-i18n="hexadecimal">Esadecimale</label>
+        <input type="text" id="conv-hex" placeholder="FF" oninput="convertNum('hex')">
+      </div>
+      <div>
+        <label for="conv-oct" data-i18n="octal">Ottale</label>
+        <input type="text" id="conv-oct" placeholder="377" oninput="convertNum('oct')">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span><span data-i18n="macTitle">MAC Address Tools</span></div>
+    <div class="input-row full">
+      <div>
+        <label for="mac-in" data-i18n="macAddress">MAC Address</label>
+        <input type="text" id="mac-in" placeholder="AA:BB:CC:DD:EE:FF o aabbccddeeff" oninput="analyzeMac()">
+      </div>
+    </div>
+    <div id="mac-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-orange"></span><span data-i18n="maskCidrTitle">Subnet Mask ↔ CIDR</span></div>
+    <div class="input-row">
+      <div>
+        <label for="mcidr-mask" data-i18n="subnetMask">Subnet Mask</label>
+        <input type="text" id="mcidr-mask" placeholder="255.255.255.0" oninput="maskToCidr()">
+      </div>
+      <div>
+        <label for="mcidr-cidr" data-i18n="cidr">CIDR</label>
+        <input type="text" id="mcidr-cidr" placeholder="/24" oninput="cidrToMask()">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-purple"></span><span data-i18n="encTitle">ASCII / HEX / Base64 / URL</span></div>
+    <div class="input-row full">
+      <div>
+        <label for="enc-in" data-i18n="textInput">Testo / Input</label>
+        <input type="text" id="enc-in" value="NetOps" placeholder="Inserisci testo..." oninput="encodeAll()">
+      </div>
+    </div>
+    <div id="enc-result"></div>
+  </div>
+</div>
+
+<!-- ===== CABLE ===== -->
+<div class="section" id="cable">
+  <div class="s-title" data-i18n="cableTitle">Cavi, Standard Fisici &amp; SFP</div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-teal"></span><span data-i18n="ethCatTitle">Categorie Cavi Ethernet</span></div>
+    <div class="table-scroll"><table class="result-table">
+      <thead><tr><th>Cat.</th><th data-i18n="maxSpeed">Velocità max</th><th data-i18n="distance">Distanza</th><th data-i18n="shielding">Schermatura</th><th data-i18n="frequency">Freq.</th></tr></thead>
+      <tbody>
+        <tr><td>Cat 3</td><td>10 Mbps</td><td>100m</td><td>UTP</td><td>16 MHz</td></tr>
+        <tr><td>Cat 5</td><td>100 Mbps</td><td>100m</td><td>UTP</td><td>100 MHz</td></tr>
+        <tr><td style="color:var(--accent)">Cat 5e</td><td>1 Gbps</td><td>100m</td><td>UTP/STP</td><td>100 MHz</td></tr>
+        <tr><td style="color:var(--accent)">Cat 6</td><td>1 Gbps / 10G (55m)</td><td>100m</td><td>UTP/STP</td><td>250 MHz</td></tr>
+        <tr><td style="color:var(--warning)">Cat 6A</td><td>10 Gbps</td><td>100m</td><td>F/UTP</td><td>500 MHz</td></tr>
+        <tr><td style="color:var(--accent2)">Cat 7</td><td>10 Gbps</td><td>100m</td><td>S/FTP</td><td>600 MHz</td></tr>
+        <tr><td style="color:var(--accent4)">Cat 8</td><td>25/40 Gbps</td><td>30m</td><td>S/FTP</td><td>2000 MHz</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span><span data-i18n="rj45Title">Ordine pin RJ-45 – T568A/B</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-bottom:6px">T568A</div>
+        <div class="table-scroll"><table class="result-table">
+          <thead><tr><th>Pin</th><th data-i18n="color">Colore</th></tr></thead>
+          <tbody id="568a-body"></tbody>
+        </table></div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-bottom:6px">T568B</div>
+        <div class="table-scroll"><table class="result-table">
+          <thead><tr><th>Pin</th><th data-i18n="color">Colore</th></tr></thead>
+          <tbody id="568b-body"></tbody>
+        </table></div>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding:8px;background:var(--bg3);border-radius:var(--r);font-size:11px;color:var(--text3);line-height:1.6">
+      💡 <b style="color:var(--text2)" data-i18n="straightThrough">Cavo diretto:</b> <span data-i18n="straightThroughDesc">stesso standard su entrambi i lati.</span><br>
+      💡 <b style="color:var(--text2)" data-i18n="crossover">Cavo incrociato:</b> <span data-i18n="crossoverDesc">T568A ↔ T568B (oggi i dispositivi hanno auto-MDIX).</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-orange"></span><span data-i18n="fiberTitle">Fibra Ottica – Tipi e Distanze</span></div>
+    <div class="table-scroll"><table class="result-table">
+      <thead><tr><th data-i18n="type">Tipo</th><th>Core</th><th data-i18n="maxSpeed">Velocità</th><th data-i18n="distance">Distanza</th><th data-i18n="use">Uso</th></tr></thead>
+      <tbody>
+        <tr><td>OS1</td><td>9μm SM</td><td>10 Gbps</td><td>2 km</td><td>Indoor</td></tr>
+        <tr><td style="color:var(--accent)">OS2</td><td>9μm SM</td><td>100 Gbps</td><td>80+ km</td><td>Outdoor WAN</td></tr>
+        <tr><td>OM1</td><td>62.5μm MM</td><td>1 Gbps</td><td>275m</td><td>Legacy</td></tr>
+        <tr><td>OM2</td><td>50μm MM</td><td>1 Gbps</td><td>550m</td><td>LAN</td></tr>
+        <tr><td style="color:var(--warning)">OM3</td><td>50μm MM</td><td>10 Gbps</td><td>300m</td><td>DC</td></tr>
+        <tr><td style="color:var(--accent2)">OM4</td><td>50μm MM</td><td>40 Gbps</td><td>400m</td><td>DC moderno</td></tr>
+        <tr><td style="color:var(--accent4)">OM5</td><td>50μm MM</td><td>100 Gbps</td><td>150m</td><td>SWDM4</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-purple"></span><span data-i18n="fiberAttTitle">Calcolatore Attenuazione Fibra</span></div>
+    <div class="input-row three">
+      <div>
+        <label for="fib-dist" data-i18n="distKm">Distanza (km)</label>
+        <input type="number" id="fib-dist" value="5" min="0.1" step="0.1" oninput="calcFiber()">
+      </div>
+      <div>
+        <label for="fib-type" data-i18n="fiberType">Tipo fibra</label>
+        <select id="fib-type" onchange="calcFiber()">
+          <option value="0.4">SM (0.4 dB/km)</option>
+          <option value="0.35">SM Premium (0.35 dB/km)</option>
+          <option value="3.5">MM OM3/4 (3.5 dB/km)</option>
+          <option value="3.75">MM OM1/2 (3.75 dB/km)</option>
+        </select>
+      </div>
+      <div>
+        <label for="fib-conn" data-i18n="connectors">Connettori</label>
+        <input type="number" id="fib-conn" value="4" min="0" oninput="calcFiber()">
+      </div>
+    </div>
+    <div id="fib-result"></div>
+  </div>
+</div>
+
+<!-- ===== WIFI ===== -->
+<div class="section" id="wifi">
+  <div class="s-title" data-i18n="wifiTitle">Wi-Fi &amp; RF</div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-teal"></span><span data-i18n="wifiStdTitle">Standard Wi-Fi</span></div>
+    <div class="table-scroll"><table class="result-table">
+      <thead><tr><th data-i18n="standard">Standard</th><th>Alias</th><th data-i18n="frequency">Frequenza</th><th>Max</th><th data-i18n="year">Anno</th></tr></thead>
+      <tbody>
+        <tr><td>802.11b</td><td>—</td><td>2.4 GHz</td><td>11 Mbps</td><td>1999</td></tr>
+        <tr><td>802.11g</td><td>—</td><td>2.4 GHz</td><td>54 Mbps</td><td>2003</td></tr>
+        <tr><td>802.11n</td><td>Wi-Fi 4</td><td>2.4/5 GHz</td><td>600 Mbps</td><td>2009</td></tr>
+        <tr><td style="color:var(--accent)">802.11ac</td><td>Wi-Fi 5</td><td>5 GHz</td><td>3.5 Gbps</td><td>2013</td></tr>
+        <tr><td style="color:var(--warning)">802.11ax</td><td>Wi-Fi 6/6E</td><td>2.4/5/6 GHz</td><td>9.6 Gbps</td><td>2019</td></tr>
+        <tr><td style="color:var(--accent4)">802.11be</td><td>Wi-Fi 7</td><td>2.4/5/6 GHz</td><td>46 Gbps</td><td>2024</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span><span data-i18n="ch24Title">Canali Wi-Fi 2.4 GHz</span></div>
+    <div style="background:var(--bg3);border-radius:var(--r);padding:10px;font-family:var(--font-mono);font-size:11px">
+      <div style="color:var(--text3);margin-bottom:8px" data-i18n="ch24Hint">Canali non sovrapposti: 1, 6, 11 (FCC) — in Europa anche 1, 5, 9, 13</div>
+      <div id="ch24-viz"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-orange"></span><span data-i18n="fsplTitle">Calcolatore FSPL – Free Space Path Loss</span></div>
+    <div class="input-row three">
+      <div>
+        <label for="fspl-dist" data-i18n="distM">Distanza (m)</label>
+        <input type="number" id="fspl-dist" value="50" oninput="calcFSPL()">
+      </div>
+      <div>
+        <label for="fspl-freq" data-i18n="frequency">Frequenza</label>
+        <select id="fspl-freq" onchange="calcFSPL()">
+          <option value="2437">2.4 GHz (ch6)</option>
+          <option value="5180">5 GHz (ch36)</option>
+          <option value="5500">5.5 GHz</option>
+          <option value="5785">5.8 GHz</option>
+          <option value="6000">6 GHz</option>
+        </select>
+      </div>
+      <div>
+        <label for="fspl-eirp">EIRP (dBm)</label>
+        <input type="number" id="fspl-eirp" value="20" oninput="calcFSPL()">
+      </div>
+    </div>
+    <div id="fspl-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-purple"></span><span data-i18n="dbmTitle">dBm ↔ mW Convertor</span></div>
+    <div class="input-row">
+      <div>
+        <label for="dbm-in">dBm</label>
+        <input type="number" id="dbm-in" value="20" step="0.1" oninput="convertDBm('dbm')">
+      </div>
+      <div>
+        <label for="mw-in">mW</label>
+        <input type="number" id="mw-in" value="100" step="0.01" oninput="convertDBm('mw')">
+      </div>
+    </div>
+    <div id="dbm-guide" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- ===== SICUREZZA ===== -->
+<div class="section" id="crypto">
+  <div class="s-title" data-i18n="secTitle">Sicurezza &amp; Crittografia</div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-teal"></span><span data-i18n="pwGenTitle">Generatore Password Sicura</span></div>
+    <div class="input-row">
+      <div>
+        <label><span data-i18n="length">Lunghezza</span>: <span id="pw-len-label" style="color:var(--accent)">16</span></label>
+        <input type="range" min="8" max="128" value="16" id="pw-len" oninput="document.getElementById('pw-len-label').textContent=this.value;genPassword()">
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;text-transform:none;font-size:12px;color:var(--text2)">
+        <input type="checkbox" id="pw-upper" checked onchange="genPassword()"> A-Z
+      </label>
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;text-transform:none;font-size:12px;color:var(--text2)">
+        <input type="checkbox" id="pw-lower" checked onchange="genPassword()"> a-z
+      </label>
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;text-transform:none;font-size:12px;color:var(--text2)">
+        <input type="checkbox" id="pw-nums" checked onchange="genPassword()"> 0-9
+      </label>
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;text-transform:none;font-size:12px;color:var(--text2)">
+        <input type="checkbox" id="pw-sym" checked onchange="genPassword()"> !@#$
+      </label>
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:10px;font-family:var(--font-mono);font-size:14px;color:var(--accent);word-break:break-all;display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span id="pw-output" style="flex:1">Genera...</span>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn btn-ghost btn-sm" onclick="copyText(document.getElementById('pw-output').textContent)" data-i18n="copy">Copia</button>
+        <button class="btn btn-ghost btn-sm" onclick="genPassword()" aria-label="Regenerate">↻</button>
+      </div>
+    </div>
+    <div id="pw-strength" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span><span data-i18n="hashTitle">Hash Generator</span></div>
+    <div class="input-row full">
+      <div>
+        <label for="hash-in" data-i18n="hashText">Testo da hashare</label>
+        <input type="text" id="hash-in" value="Hello Network" placeholder="Inserisci testo...">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="generateHash()" data-i18n="genHash">Genera Hash ▶</button>
+    <div id="hash-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-orange"></span><span data-i18n="pwAnalyzerTitle">Analizzatore Forza Password</span></div>
+    <div class="input-row full">
+      <div>
+        <label for="pwa-in" data-i18n="pwToAnalyze">Password da analizzare</label>
+        <input type="password" id="pwa-in" placeholder="Inserisci password..." oninput="analyzePassword()">
+      </div>
+    </div>
+    <div id="pwa-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot dot-purple"></span><span data-i18n="aggrTitle">CIDR Aggregator – Route Summarization</span></div>
+    <div class="input-row full">
+      <div>
+        <label for="aggr-in" data-i18n="networksPerLine">Reti (una per riga)</label>
+        <textarea id="aggr-in" rows="4" style="resize:vertical">192.168.0.0/24
+192.168.1.0/24
+192.168.2.0/24
+192.168.3.0/24</textarea>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="aggregateRoutes()" data-i18n="aggrBtn">Aggrega Route ▶</button>
+    <div id="aggr-result"></div>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<div class="toast" id="toast" data-i18n="copied">Copiato!</div>
+
+<script>
+/* ============================================================
+   I18N
+============================================================ */
+const i18n = {
+  it: {
+    logoSub:"Network & IT Tools", tabSubnet:"Subnet / VLSM", tabIPTools:"IP Tools", tabPorts:"Porte & Protocolli",
+    tabBandwidth:"Bandwidth", tabConverters:"Convertitori", tabCable:"Cavi & Fisica", tabWifi:"Wi-Fi", tabCrypto:"Sicurezza",
+    subnetTitle:"Calcolatore Subnet IPv4 & VLSM", singleSubnet:"Calcolo Subnet Singola",
+    ipAddress:"Indirizzo IP", cidrMask:"CIDR / Maschera", calculate:"Calcola ▶",
+    copyAll:"Copia tutto", share:"Condividi", copied:"Copiato!",
+    splitTitle:"Subnetting Visuale – Dividi Rete", baseNetwork:"Rete Base", baseCIDR:"CIDR Base",
+    newMask:"Nuova Maschera", split:"Dividi",
+    vlsmTitle:"VLSM – Variable Length Subnet Mask",
+    vlsmHint:"Inserisci il numero di host per ogni subnet. Le subnet saranno allocate in ordine decrescente.",
+    startingNetwork:"Rete di partenza (CIDR)", addSubnet:"+ Subnet", calcVLSM:"Calcola VLSM ▶",
+    ipToolsTitle:"Strumenti IP", checkIPTitle:"Verifica IP (IPv4/IPv6)", analyze:"Analizza",
+    ipConverterTitle:"Convertor IP ↔ Decimale ↔ Binario ↔ Hex", ipv4Address:"Indirizzo IPv4",
+    wildcardTitle:"Wildcard Mask", subnetMask:"Subnet Mask", wildcard:"Wildcard",
+    wildcardRangeTitle:"Wildcard da Range IP (ACL)",
+    wildcardRangeHint:"Inserisci IP iniziale e finale per ottenere le wildcard mask corrispondenti.",
+    startIP:"IP Iniziale", endIP:"IP Finale",
+    compareTitle:"Confronto Reti – Sono nella stessa subnet?", ip1:"IP 1", ip2:"IP 2", mask:"Maschera", check:"Controlla",
+    overlapTitle:"Overlap Detector", overlapHint:"Verifica se due o più subnet si sovrappongono (una per riga, formato CIDR).",
+    checkOverlap:"Verifica Overlap ▶", rangeGenTitle:"Generatore Range IP", networkCIDR:"Rete CIDR", generate:"Genera",
+    portsTitle:"Porte & Protocolli", searchPortTitle:"Cerca porta o protocollo", quickCat:"Categorie rapide",
+    remote:"Remoto", monitoring:"Monitoraggio", all:"Tutti",
+    bwTitle:"Calcolo Bandwidth & Trasferimento", transferTitle:"Tempo di Trasferimento File",
+    fileSize:"Dimensione File", unit:"Unità", transferSpeed:"Velocità di trasferimento",
+    throughputTitle:"Throughput & Utilizzo Linea", totalBW:"Banda totale (Mbps)", usagePct:"Utilizzo %",
+    dataConvTitle:"Convertor Unità Dati", value:"Valore", from:"Da",
+    convTitle:"Convertitori", numConvTitle:"Binario ↔ Decimale ↔ Esadecimale ↔ Ottale",
+    decimal:"Decimale", binary:"Binario", hexadecimal:"Esadecimale", octal:"Ottale",
+    macTitle:"MAC Address Tools", macAddress:"MAC Address",
+    maskCidrTitle:"Subnet Mask ↔ CIDR", cidr:"CIDR",
+    encTitle:"ASCII / HEX / Base64 / URL", textInput:"Testo / Input",
+    cableTitle:"Cavi, Standard Fisici & SFP", ethCatTitle:"Categorie Cavi Ethernet",
+    maxSpeed:"Velocità max", distance:"Distanza", shielding:"Schermatura", frequency:"Freq.",
+    rj45Title:"Ordine pin RJ-45 – T568A/B", color:"Colore",
+    straightThrough:"Cavo diretto:", straightThroughDesc:"stesso standard su entrambi i lati.",
+    crossover:"Cavo incrociato:", crossoverDesc:"T568A ↔ T568B (oggi i dispositivi hanno auto-MDIX).",
+    fiberTitle:"Fibra Ottica – Tipi e Distanze", type:"Tipo", use:"Uso",
+    fiberAttTitle:"Calcolatore Attenuazione Fibra", distKm:"Distanza (km)", fiberType:"Tipo fibra", connectors:"Connettori",
+    wifiTitle:"Wi-Fi & RF", wifiStdTitle:"Standard Wi-Fi", standard:"Standard", year:"Anno",
+    ch24Title:"Canali Wi-Fi 2.4 GHz", ch24Hint:"Canali non sovrapposti: 1, 6, 11 (FCC) — in Europa anche 1, 5, 9, 13",
+    fsplTitle:"Calcolatore FSPL – Free Space Path Loss", distM:"Distanza (m)",
+    dbmTitle:"dBm ↔ mW Convertor",
+    secTitle:"Sicurezza & Crittografia", pwGenTitle:"Generatore Password Sicura", length:"Lunghezza", copy:"Copia",
+    hashTitle:"Hash Generator", hashText:"Testo da hashare", genHash:"Genera Hash ▶",
+    pwAnalyzerTitle:"Analizzatore Forza Password", pwToAnalyze:"Password da analizzare",
+    aggrTitle:"CIDR Aggregator – Route Summarization", networksPerLine:"Reti (una per riga)", aggrBtn:"Aggrega Route ▶",
+    // Dynamic labels
+    network:"Rete", broadcast:"Broadcast", hostsUsable:"Host usabili", classType:"Classe / Tipo",
+    firstHost:"1° Host", lastHost:"Ultimo Host", field:"Campo", ipField:"IP", binaryShort:"Binario (ultimi 2 ottetti)",
+    host:"Host", name:"Nome", firstIP:"1° IP", lastIP:"Ultimo IP", insufficientSpace:"⚠ Spazio insufficiente nella rete base!",
+    subnetCount:"subnet da", withHosts:"con", hostsEach:"host ciascuna", showing:"mostrate prime",
+    hostCount:"IP host", showing48:"mostrati i primi 48", copyAllBtn:"Copia tutti",
+    time:"Tempo", speed:"Velocità", mbpsTheo:"MB/s teorici", size:"Dimensione",
+    used:"Usato", free:"Libero", usage:"Utilizzo", normal:"Normale", high:"Alto", critical:"CRITICO",
+    bit:"bit", byte:"byte", kb:"Kilobit (kb)", kbyte:"Kilobyte (KB)", mb:"Megabit (Mb)", mbyte:"Megabyte (MB)",
+    gb:"Gigabit (Gb)", gbyte:"Gigabyte (GB)", tb:"Terabyte (TB)",
+    ieeeColon:"IEEE (colon)", dash:"Dash", cisco:"Cisco", oui:"OUI", macType:"Tipo",
+    multicast:"Multicast", localAdmin:"Local Admin", unicastGlobal:"Unicast Globale",
+    strength:["","Molto debole","Debole","Discreta","Buona","Buona","Forte","Molto forte"],
+    entropy:"Entropia", approx:"~",
+    routes:"reti", supernets:"supernet aggregate", supernet:"Supernet",
+    routesAgg:"reti →", noValidRoutes:"Nessuna route valida inserita",
+    sameSubnet:"✓ Stessa subnet – comunicano direttamente",
+    diffSubnet:"✗ Subnet diverse – necessario routing",
+    ip1Net:"Rete IP1", ip2Net:"Rete IP2",
+    ipInvalid:"IP non valido", ipFormat:"Formato IP non riconosciuto",
+    version:"Versione", cls:"Classe", ipType:"Tipo", decimalInt:"Decimale (intero)",
+    binary:"Binario", hex:"Esadecimale", urlEnc:"URL encoded",
+    privateRFC:"Privato RFC1918", loopback:"Loopback", linkLocal:"Link-local (APIPA)",
+    multicastT:"Multicast", reserved:"Riservato", public:"Pubblico", allInternet:"Tutto Internet",
+    defaultNet:"Rete di default", uniqueLocal:"Unique Local", global:"Globale",
+    noSignal:"Quasi nessun segnale", minAbs:"Minimo assoluto", veryWeak:"Segnale molto debole",
+    weak:"Segnale scarso", voipThreshold:"Soglia usabilità VoIP", good:"Segnale buono",
+    great:"Segnale ottimo", excellent:"Segnale eccellente", apPower:"Potenza tipica AP",
+    ref:"riferimento", quality:"Qualità segnale", fsplLbl:"FSPL", rssiEst:"RSSI stimato",
+    fiberAtt:"Att. fibra", connAtt:"Att. connettori", totalAtt:"Att. totale", margin:"Margine",
+    budget:"Budget link", safetyMargin:"Margine sicurezza", connEach:"cad.",
+    overlapped:"⚠ SOVRAPPOSIZIONE RILEVATA", noOverlap:"✓ Nessuna sovrapposizione",
+    conflictingWith:"In conflitto con", invalidMask:"Maschera non valida", invalidCIDR:"CIDR non valido",
+    cidrRange:"CIDR deve essere tra 0 e 32", invalidIP:"IP non valido",
+    splitInvalid:"La nuova maschera deve essere maggiore di quella base",
+    wildcardRes:"Wildcard mask necessarie", range:"Range", single:"Singolo IP",
+    strengthLbl:"Robustezza", checkRange:"Verifica",
+    noOverlapDesc:"Tutte le subnet sono indipendenti.", overlappedDesc:"Alcune subnet condividono spazio di indirizzamento."
+  },
+  en: {
+    logoSub:"Network & IT Tools", tabSubnet:"Subnet / VLSM", tabIPTools:"IP Tools", tabPorts:"Ports & Protocols",
+    tabBandwidth:"Bandwidth", tabConverters:"Converters", tabCable:"Cables & Physical", tabWifi:"Wi-Fi", tabCrypto:"Security",
+    subnetTitle:"IPv4 & VLSM Subnet Calculator", singleSubnet:"Single Subnet Calculation",
+    ipAddress:"IP Address", cidrMask:"CIDR / Mask", calculate:"Calculate ▶",
+    copyAll:"Copy all", share:"Share", copied:"Copied!",
+    splitTitle:"Visual Subnetting – Split Network", baseNetwork:"Base Network", baseCIDR:"Base CIDR",
+    newMask:"New Mask", split:"Split",
+    vlsmTitle:"VLSM – Variable Length Subnet Mask",
+    vlsmHint:"Enter the number of hosts for each subnet. Subnets will be allocated in descending order.",
+    startingNetwork:"Starting Network (CIDR)", addSubnet:"+ Subnet", calcVLSM:"Calculate VLSM ▶",
+    ipToolsTitle:"IP Tools", checkIPTitle:"Check IP (IPv4/IPv6)", analyze:"Analyze",
+    ipConverterTitle:"IP ↔ Decimal ↔ Binary ↔ Hex Converter", ipv4Address:"IPv4 Address",
+    wildcardTitle:"Wildcard Mask", subnetMask:"Subnet Mask", wildcard:"Wildcard",
+    wildcardRangeTitle:"Wildcard from IP Range (ACL)",
+    wildcardRangeHint:"Enter start and end IP to get the corresponding wildcard masks.",
+    startIP:"Start IP", endIP:"End IP",
+    compareTitle:"Compare Networks – Same subnet?", ip1:"IP 1", ip2:"IP 2", mask:"Mask", check:"Check",
+    overlapTitle:"Overlap Detector", overlapHint:"Check if two or more subnets overlap (one per line, CIDR format).",
+    checkOverlap:"Check Overlap ▶", rangeGenTitle:"IP Range Generator", networkCIDR:"Network CIDR", generate:"Generate",
+    portsTitle:"Ports & Protocols", searchPortTitle:"Search port or protocol", quickCat:"Quick categories",
+    remote:"Remote", monitoring:"Monitoring", all:"All",
+    bwTitle:"Bandwidth & Transfer Calculator", transferTitle:"File Transfer Time",
+    fileSize:"File Size", unit:"Unit", transferSpeed:"Transfer speed",
+    throughputTitle:"Throughput & Line Utilization", totalBW:"Total bandwidth (Mbps)", usagePct:"Usage %",
+    dataConvTitle:"Data Unit Converter", value:"Value", from:"From",
+    convTitle:"Converters", numConvTitle:"Binary ↔ Decimal ↔ Hexadecimal ↔ Octal",
+    decimal:"Decimal", binary:"Binary", hexadecimal:"Hexadecimal", octal:"Octal",
+    macTitle:"MAC Address Tools", macAddress:"MAC Address",
+    maskCidrTitle:"Subnet Mask ↔ CIDR", cidr:"CIDR",
+    encTitle:"ASCII / HEX / Base64 / URL", textInput:"Text / Input",
+    cableTitle:"Cables, Physical Standards & SFP", ethCatTitle:"Ethernet Cable Categories",
+    maxSpeed:"Max Speed", distance:"Distance", shielding:"Shielding", frequency:"Freq.",
+    rj45Title:"RJ-45 Pinout – T568A/B", color:"Color",
+    straightThrough:"Straight-through:", straightThroughDesc:"same standard on both ends.",
+    crossover:"Crossover:", crossoverDesc:"T568A ↔ T568B (modern devices support auto-MDIX).",
+    fiberTitle:"Fiber Optics – Types and Distances", type:"Type", use:"Use",
+    fiberAttTitle:"Fiber Attenuation Calculator", distKm:"Distance (km)", fiberType:"Fiber type", connectors:"Connectors",
+    wifiTitle:"Wi-Fi & RF", wifiStdTitle:"Wi-Fi Standards", standard:"Standard", year:"Year",
+    ch24Title:"Wi-Fi 2.4 GHz Channels", ch24Hint:"Non-overlapping channels: 1, 6, 11 (FCC) — in Europe also 1, 5, 9, 13",
+    fsplTitle:"FSPL – Free Space Path Loss Calculator", distM:"Distance (m)",
+    dbmTitle:"dBm ↔ mW Converter",
+    secTitle:"Security & Cryptography", pwGenTitle:"Secure Password Generator", length:"Length", copy:"Copy",
+    hashTitle:"Hash Generator", hashText:"Text to hash", genHash:"Generate Hash ▶",
+    pwAnalyzerTitle:"Password Strength Analyzer", pwToAnalyze:"Password to analyze",
+    aggrTitle:"CIDR Aggregator – Route Summarization", networksPerLine:"Networks (one per line)", aggrBtn:"Aggregate Routes ▶",
+    network:"Network", broadcast:"Broadcast", hostsUsable:"Usable hosts", classType:"Class / Type",
+    firstHost:"1st Host", lastHost:"Last Host", field:"Field", ipField:"IP", binaryShort:"Binary (last 2 octets)",
+    host:"Host", name:"Name", firstIP:"1st IP", lastIP:"Last IP", insufficientSpace:"⚠ Insufficient space in base network!",
+    subnetCount:"subnets of", withHosts:"with", hostsEach:"hosts each", showing:"showing first",
+    hostCount:"IP hosts", showing48:"showing first 48", copyAllBtn:"Copy all",
+    time:"Time", speed:"Speed", mbpsTheo:"Theoretical MB/s", size:"Size",
+    used:"Used", free:"Free", usage:"Usage", normal:"Normal", high:"High", critical:"CRITICAL",
+    bit:"bit", byte:"byte", kb:"Kilobit (kb)", kbyte:"Kilobyte (KB)", mb:"Megabit (Mb)", mbyte:"Megabyte (MB)",
+    gb:"Gigabit (Gb)", gbyte:"Gigabyte (GB)", tb:"Terabyte (TB)",
+    ieeeColon:"IEEE (colon)", dash:"Dash", cisco:"Cisco", oui:"OUI", macType:"Type",
+    multicast:"Multicast", localAdmin:"Local Admin", unicastGlobal:"Global Unicast",
+    strength:["","Very weak","Weak","Fair","Good","Good","Strong","Very strong"],
+    entropy:"Entropy", approx:"~",
+    routes:"networks", supernets:"aggregated supernets", supernet:"Supernet",
+    routesAgg:"networks →", noValidRoutes:"No valid routes entered",
+    sameSubnet:"✓ Same subnet – they communicate directly",
+    diffSubnet:"✗ Different subnets – routing required",
+    ip1Net:"IP1 Network", ip2Net:"IP2 Network",
+    ipInvalid:"Invalid IP", ipFormat:"IP format not recognized",
+    version:"Version", cls:"Class", ipType:"Type", decimalInt:"Decimal (integer)",
+    binary:"Binary", hex:"Hexadecimal", urlEnc:"URL encoded",
+    privateRFC:"Private RFC1918", loopback:"Loopback", linkLocal:"Link-local (APIPA)",
+    multicastT:"Multicast", reserved:"Reserved", public:"Public", allInternet:"Entire Internet",
+    defaultNet:"Default Network", uniqueLocal:"Unique Local", global:"Global",
+    noSignal:"Almost no signal", minAbs:"Absolute minimum", veryWeak:"Very weak signal",
+    weak:"Poor signal", voipThreshold:"VoIP usability threshold", good:"Good signal",
+    great:"Great signal", excellent:"Excellent signal", apPower:"Typical AP power",
+    ref:"reference", quality:"Signal quality", fsplLbl:"FSPL", rssiEst:"Estimated RSSI",
+    fiberAtt:"Fiber att.", connAtt:"Connector att.", totalAtt:"Total att.", margin:"Margin",
+    budget:"Link budget", safetyMargin:"Safety margin", connEach:"each",
+    overlapped:"⚠ OVERLAP DETECTED", noOverlap:"✓ No overlap",
+    conflictingWith:"Conflicts with", invalidMask:"Invalid mask", invalidCIDR:"Invalid CIDR",
+    cidrRange:"CIDR must be between 0 and 32", invalidIP:"Invalid IP",
+    splitInvalid:"New mask must be greater than base mask",
+    wildcardRes:"Required wildcard masks", range:"Range", single:"Single IP",
+    strengthLbl:"Strength", checkRange:"Check",
+    noOverlapDesc:"All subnets are independent.", overlappedDesc:"Some subnets share address space."
+  }
+};
+
+let currentLang = localStorage.getItem('netops-lang') || 'it';
+
+function t(key) { return i18n[currentLang][key] || key; }
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('netops-lang', lang);
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (i18n[lang][key]) {
+      el.textContent = i18n[lang][key];
+    }
+  });
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('lang-' + lang).classList.add('active');
+  // Re-render dynamic results
+  reRenderAll();
+}
+
+function reRenderAll() {
+  if (document.getElementById('sn-result').style.display !== 'none') calcSubnet();
+  if (document.getElementById('ipc-results').innerHTML) convertIP();
+  if (document.getElementById('ip-check-result').innerHTML) checkIP();
+  if (document.getElementById('cmp-result').innerHTML) compareIPs();
+  if (document.getElementById('range-result').innerHTML) genRange();
+  if (document.getElementById('wr-result').innerHTML) calcWildcardRange();
+  if (document.getElementById('ovl-result').innerHTML) checkOverlap();
+  if (document.getElementById('vlsm-result').innerHTML) calcVLSM();
+  if (document.getElementById('vsn-result').innerHTML) splitSubnet();
+  if (document.getElementById('bw-result').innerHTML) calcTransfer();
+  if (document.getElementById('th-result').innerHTML) calcThroughput();
+  if (document.getElementById('du-result').innerHTML) convertData();
+  if (document.getElementById('mac-result').innerHTML) analyzeMac();
+  if (document.getElementById('enc-result').innerHTML) encodeAll();
+  if (document.getElementById('fib-result').innerHTML) calcFiber();
+  if (document.getElementById('fspl-result').innerHTML) calcFSPL();
+  if (document.getElementById('dbm-guide').innerHTML) convertDBm('dbm');
+  if (document.getElementById('pw-strength').innerHTML) analyzePasswordStr(document.getElementById('pw-output').textContent);
+  if (document.getElementById('hash-result').innerHTML) generateHash();
+  if (document.getElementById('pwa-result').innerHTML) analyzePassword();
+  if (document.getElementById('aggr-result').innerHTML) aggregateRoutes();
+  if (document.getElementById('port-results').innerHTML) searchPorts();
+  renderCh24();
+}
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+function showTab(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+function copyText(t){
+  navigator.clipboard.writeText(t).catch(()=>{});
+  const toast=document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),1500);
+}
+
+/* ============================================================
+   IP UTILITIES
+============================================================ */
+function ipToNum(ip){
+  const p=ip.split('.').map(Number);
+  return((p[0]<<24)|(p[1]<<16)|(p[2]<<8)|p[3])>>>0;
+}
+function numToIp(n){
+  return[(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+}
+function cidrToMaskNum(c){
+  if(c===0) return 0;
+  return (0xFFFFFFFF << (32-c)) >>> 0;
+}
+function maskToCidrNum(mask){
+  const n=ipToNum(mask);
+  let c=0;
+  for(let i=31;i>=0;i--){ if(n&(1<<i)) c++; else break; }
+  return c;
+}
+function isValidIPv4(ip){
+  return /^(\d{1,3}\.){3}\d{1,3}$/.test(ip) && ip.split('.').every(x=>+x>=0 && +x<=255);
+}
+function parseCIDRInput(input){
+  input=input.trim();
+  if(input.includes('/')){
+    const parts=input.split('/');
+    return { ip:parts[0].trim(), cidr:parseInt(parts[1],10) };
+  }
+  if(/^\d+$/.test(input)) return { cidr:parseInt(input,10) };
+  if(input.includes('.')) return { mask:input };
+  return null;
+}
+
+/* ============================================================
+   SUBNET CALCULATOR
+============================================================ */
+let _lastSubnetResult = null;
+
+function calcSubnet(){
+  const ipStr=document.getElementById('sn-ip').value.trim();
+  const cidrInput=document.getElementById('sn-cidr').value.trim();
+  let cidr;
+  const parsed=parseCIDRInput(cidrInput);
+  if(parsed && parsed.cidr!==undefined && !isNaN(parsed.cidr)){
+    cidr=parsed.cidr;
+  } else if(parsed && parsed.mask){
+    if(!isValidIPv4(parsed.mask)){ alert(t('invalidMask')); return; }
+    cidr=maskToCidrNum(parsed.mask);
+  } else {
+    alert(t('invalidCIDR')); return;
+  }
+  if(cidr<0||cidr>32){ alert(t('cidrRange')); return; }
+  if(!isValidIPv4(ipStr)){ alert(t('invalidIP')); return; }
+
+  const ip=ipToNum(ipStr);
+  const mask=cidrToMaskNum(cidr);
+  const network=(ip&mask)>>>0;
+  const broadcast=(network|(~mask>>>0))>>>0;
+  const totalHosts=cidr>=31?(cidr===31?2:1):Math.pow(2,32-cidr)-2;
+  const firstHost=cidr>=31?network:network+1;
+  const lastHost=cidr>=31?broadcast:broadcast-1;
+
+  const cls=cidr<=8?'A':cidr<=16?'B':cidr<=24?'C':'Subnet';
+  let type;
+  const o1=network>>>24;
+  const o2=(network>>>16)&255;
+  if(network===0) type=t('allInternet');
+  else if(o1===10) type=t('privateRFC');
+  else if(o1===172 && o2>=16 && o2<=31) type=t('privateRFC');
+  else if(o1===192 && o2===168) type=t('privateRFC');
+  else if(o1===127) type=t('loopback');
+  else if(o1>=224 && o1<=239) type=t('multicastT');
+  else if(o1>=240) type=t('reserved');
+  else type=t('public');
+
+  _lastSubnetResult = {
+    network:numToIp(network), broadcast:numToIp(broadcast),
+    mask:numToIp(mask), wildcard:numToIp(~mask>>>0),
+    hosts:totalHosts, cidr, cls, type, first:numToIp(firstHost), last:numToIp(lastHost),
+    binNetwork:toBin2(network), binFirst:toBin2(firstHost), binLast:toBin2(lastHost), binBroadcast:toBin2(broadcast)
+  };
+
+  document.getElementById('sn-result').style.display='block';
+  document.getElementById('sn-grid').innerHTML=`
+    <div class="info-pill"><span class="info-pill-label">${t('network')}</span><span class="info-pill-val">${numToIp(network)}</span></div>
+    <div class="info-pill"><span class="info-pill-label">${t('broadcast')}</span><span class="info-pill-val">${numToIp(broadcast)}</span></div>
+    <div class="info-pill"><span class="info-pill-label">${t('subnetMask')}</span><span class="info-pill-val">${numToIp(mask)}</span></div>
+    <div class="info-pill"><span class="info-pill-label">${t('wildcard')}</span><span class="info-pill-val">${numToIp(~mask>>>0)}</span></div>
+    <div class="info-pill"><span class="info-pill-label">${t('hostsUsable')}</span><span class="info-pill-val" style="color:var(--success)">${totalHosts.toLocaleString()}</span></div>
+    <div class="info-pill"><span class="info-pill-label">${t('classType')}</span><span class="info-pill-val">${cls} · ${type}</span></div>
+  `;
+  document.getElementById('sn-table').innerHTML=`
+    <thead><tr><th>${t('field')}</th><th>${t('ipField')}</th><th>${t('binaryShort')}</th></tr></thead>
+    <tbody>
+      <tr><td style="color:var(--text3)">${t('network')}</td><td style="color:var(--accent)">${numToIp(network)}/${cidr}</td><td style="color:var(--text3)">${toBin2(network)}</td></tr>
+      <tr><td style="color:var(--text3)">${t('firstHost')}</td><td style="color:var(--success)">${numToIp(firstHost)}</td><td style="color:var(--text3)">${toBin2(firstHost)}</td></tr>
+      <tr><td style="color:var(--text3)">${t('lastHost')}</td><td style="color:var(--success)">${numToIp(lastHost)}</td><td style="color:var(--text3)">${toBin2(lastHost)}</td></tr>
+      <tr><td style="color:var(--text3)">${t('broadcast')}</td><td style="color:var(--accent3)">${numToIp(broadcast)}</td><td style="color:var(--text3)">${toBin2(broadcast)}</td></tr>
+    </tbody>
+  `;
+}
+
+function toBin2(n){
+  const oct3=((n>>>8)&255).toString(2).padStart(8,'0');
+  const oct4=(n&255).toString(2).padStart(8,'0');
+  return `...${oct3}.${oct4}`;
+}
+
+function copySubnetResult(){
+  if(!_lastSubnetResult) return;
+  const r=_lastSubnetResult;
+  const txt=`Network: ${r.network}/${r.cidr}\nBroadcast: ${r.broadcast}\nMask: ${r.mask}\nWildcard: ${r.wildcard}\nHosts: ${r.hosts}\nFirst: ${r.first}\nLast: ${r.last}`;
+  copyText(txt);
+}
+
+function shareSubnet(){
+  const ip=document.getElementById('sn-ip').value.trim();
+  const cidr=document.getElementById('sn-cidr').value.trim();
+  const url=`${location.origin}${location.pathname}?ip=${encodeURIComponent(ip)}&mask=${encodeURIComponent(cidr)}`;
+  if(navigator.share){
+    navigator.share({title:'NetOps Toolkit',url}).catch(()=>{});
+  } else {
+    copyText(url);
+  }
+}
+
+function splitSubnet(){
+  const baseIp=document.getElementById('vsn-net').value.trim();
+  const baseCidr=parseInt(document.getElementById('vsn-cidr').value.trim(),10);
+  const newCidr=parseInt(document.getElementById('vsn-new').value.trim(),10);
+  const out=document.getElementById('vsn-result');
+  if(isNaN(baseCidr)||isNaN(newCidr)||!isValidIPv4(baseIp)){
+    out.innerHTML=`<div style="color:var(--danger);font-size:12px;margin-top:8px">${t('invalidIP')}</div>`;return;
+  }
+  if(newCidr<=baseCidr||newCidr>32){
+    out.innerHTML=`<div style="color:var(--danger);font-size:12px;margin-top:8px">${t('splitInvalid')}</div>`;return;
+  }
+  const count=Math.pow(2,newCidr-baseCidr);
+  const baseNum=ipToNum(baseIp)&cidrToMaskNum(baseCidr);
+  const blockSize=Math.pow(2,32-newCidr);
+  let rows='';
+  const show=Math.min(count,32);
+  for(let i=0;i<show;i++){
+    const net=baseNum+i*blockSize;
+    const bcast=net+blockSize-1;
+    const h=newCidr>=31?(newCidr===31?2:1):blockSize-2;
+    rows+=`<tr><td style="color:var(--text3)">#${i+1}</td><td style="color:var(--accent)">${numToIp(net)}/${newCidr}</td><td style="color:var(--success)">${numToIp(net+1)}</td><td style="color:var(--success)">${numToIp(bcast-1)}</td><td style="color:var(--accent3)">${numToIp(bcast)}</td><td>${h}</td></tr>`;
+  }
+  out.innerHTML=`
+    <div style="font-size:11px;color:var(--text3);margin:8px 0;font-family:var(--font-mono)">${count.toLocaleString()} ${t('subnetCount')} /${newCidr} ${t('withHosts')} ${blockSize-2} ${t('hostsEach')}${count>32?` (${t('showing')} 32)`:''}</div>
+    <div class="table-scroll"><table class="result-table"><thead><tr><th>#</th><th>${t('network')}</th><th>${t('firstHost')}</th><th>${t('lastHost')}</th><th>${t('broadcast')}</th><th>${t('host')}</th></tr></thead><tbody>${rows}</tbody></table></div>
+  `;
+}
+
+let vlsmCount=2;
+function addVlsmRow(){
+  vlsmCount++;
+  const div=document.getElementById('vlsm-subnets');
+  const row=document.createElement('div');
+  row.className='vlsm-row';
+  row.innerHTML=`<span style="font-size:11px;color:var(--text3);font-family:var(--font-mono)">#${vlsmCount}</span><input type="number" placeholder="${t('host')}" min="1"><input type="text" placeholder="${t('name')}" style="max-width:110px"><button class="btn btn-ghost btn-sm" onclick="removeVlsmRow(this)">✕</button>`;
+  div.appendChild(row);
+}
+function removeVlsmRow(btn){
+  const rows=document.querySelectorAll('#vlsm-subnets .vlsm-row');
+  if(rows.length>1) btn.parentElement.remove();
+}
+
+function calcVLSM(){
+  const netStr=document.getElementById('vlsm-net').value.trim();
+  const parts=netStr.split('/');
+  if(parts.length!==2){ document.getElementById('vlsm-result').innerHTML=`<div style="color:var(--danger);font-size:11px;margin-top:6px">${t('invalidCIDR')}</div>`; return; }
+  const netIp=parts[0].trim();
+  const baseCidr=parseInt(parts[1],10);
+  if(!isValidIPv4(netIp)||isNaN(baseCidr)||baseCidr<0||baseCidr>32){
+    document.getElementById('vlsm-result').innerHTML=`<div style="color:var(--danger);font-size:11px;margin-top:6px">${t('invalidCIDR')}</div>`; return;
+  }
+  const baseNum=ipToNum(netIp)&cidrToMaskNum(baseCidr);
+  const baseEnd=baseNum+Math.pow(2,32-baseCidr)-1;
+  const rows=document.querySelectorAll('#vlsm-subnets .vlsm-row');
+  const subnets=[];
+  rows.forEach((r,i)=>{
+    const inputs=r.querySelectorAll('input');
+    const h=parseInt(inputs[0].value,10)||0;
+    const name=inputs[1].value||`Subnet ${i+1}`;
+    if(h>0) subnets.push({hosts:h,name});
+  });
+  if(!subnets.length){ document.getElementById('vlsm-result').innerHTML=''; return; }
+  subnets.sort((a,b)=>b.hosts-a.hosts);
+  let cur=baseNum;
+  let html=`<div class="table-scroll" style="margin-top:10px"><table class="result-table"><thead><tr><th>${t('name')}</th><th>${t('network')}</th><th>Mask</th><th>${t('host')}</th><th>${t('firstIP')}</th><th>${t('lastIP')}</th></tr></thead><tbody>`;
+  let ok=true;
+  subnets.forEach(s=>{
+    const need=s.hosts+2;
+    let bits=1;
+    while(Math.pow(2,bits)<need) bits++;
+    const cidr=32-bits;
+    const block=Math.pow(2,bits);
+    const aligned=Math.ceil(cur/block)*block;
+    const net=aligned;
+    const bcast=net+block-1;
+    if(bcast>baseEnd) ok=false;
+    html+=`<tr><td style="color:var(--accent4)">${s.name}</td><td style="color:var(--accent)">${numToIp(net)}/${cidr}</td><td>${numToIp(cidrToMaskNum(cidr))}</td><td style="color:var(--success)">${block-2}</td><td>${numToIp(net+1)}</td><td>${numToIp(bcast-1)}</td></tr>`;
+    cur=bcast+1;
+  });
+  html+='</tbody></table></div>';
+  if(!ok) html+=`<div style="color:var(--danger);font-size:11px;margin-top:6px">${t('insufficientSpace')}</div>`;
+  document.getElementById('vlsm-result').innerHTML=html;
+}
+
+/* ============================================================
+   IP TOOLS
+============================================================ */
+function checkIP(){
+  const ip=document.getElementById('ip-check').value.trim();
+  const out=document.getElementById('ip-check-result');
+  let info='';
+  if(/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)){
+    const p=ip.split('.').map(Number);
+    if(!p.every(x=>x>=0&&x<=255)){
+      out.innerHTML=`<div style="color:var(--danger);margin-top:8px">${t('ipInvalid')}</div>`;return;
+    }
+    const n=ipToNum(ip);
+    const cls=p[0]<128?'A':p[0]<192?'B':p[0]<224?'C':p[0]<240?'D (Multicast)':'E (Reserved)';
+    let type;
+    if(p[0]===10) type=t('privateRFC');
+    else if(p[0]===172&&p[1]>=16&&p[1]<=31) type=t('privateRFC');
+    else if(p[0]===192&&p[1]===168) type=t('privateRFC');
+    else if(p[0]===127) type=t('loopback');
+    else if(p[0]===169&&p[1]===254) type=t('linkLocal');
+    else if(p[0]>=224&&p[0]<=239) type=t('multicastT');
+    else if(p[0]===0) type=t('defaultNet');
+    else type=t('public');
+    const bin=p.map(x=>x.toString(2).padStart(8,'0')).join('.');
+    const hex=p.map(x=>x.toString(16).padStart(2,'0').toUpperCase()).join(':');
+    info=`<div class="info-grid" style="margin-top:8px">
+      <div class="info-pill"><span class="info-pill-label">${t('version')}</span><span class="info-pill-val">IPv4</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('cls')}</span><span class="info-pill-val">${cls}</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('ipType')}</span><span class="info-pill-val" style="color:${type.includes('Private')||type.includes('Privato')?'var(--warning)':type===t('public')?'var(--success)':'var(--accent2)'}">${type}</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('decimalInt')}</span><span class="info-pill-val">${n.toLocaleString()}</span></div>
+      <div class="info-pill" style="grid-column:span 2"><span class="info-pill-label">${t('binary')}</span><span class="info-pill-val" style="font-size:10px">${bin}</span></div>
+      <div class="info-pill" style="grid-column:span 2"><span class="info-pill-label">${t('hex')}</span><span class="info-pill-val">${hex}</span></div>
+    </div>`;
+  } else if(ip.includes(':')){
+    let t6='Global';
+    if(ip==='::1') t6=t('loopback');
+    else if(ip.toLowerCase().startsWith('fe80')) t6=t('linkLocal');
+    else if(/^f[cd]/i.test(ip)) t6=t('uniqueLocal');
+    info=`<div class="info-grid" style="margin-top:8px">
+      <div class="info-pill"><span class="info-pill-label">${t('version')}</span><span class="info-pill-val">IPv6</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('ipType')}</span><span class="info-pill-val">${t6}</span></div>
+    </div>`;
+  } else {
+    info=`<div style="color:var(--danger);margin-top:8px;font-size:12px">${t('ipFormat')}</div>`;
+  }
+  out.innerHTML=info;
+}
+
+function convertIP(){
+  const ip=document.getElementById('ipc-ip').value.trim();
+  if(!isValidIPv4(ip)){ document.getElementById('ipc-results').innerHTML=''; return; }
+  const p=ip.split('.').map(Number);
+  const dec=((p[0]<<24)|(p[1]<<16)|(p[2]<<8)|p[3])>>>0;
+  const bin=p.map(x=>x.toString(2).padStart(8,'0')).join('.');
+  const hex=p.map(x=>x.toString(16).padStart(2,'0').toUpperCase()).join('');
+  document.getElementById('ipc-results').innerHTML=`
+    <div class="result-label">${t('decimalInt')}</div><div class="result-box">${dec} <button class="copy-btn" onclick="copyText('${dec}')">⎘</button></div>
+    <div class="result-label">${t('binary')}</div><div class="result-box" style="font-size:11px">${bin} <button class="copy-btn" onclick="copyText('${bin}')">⎘</button></div>
+    <div class="result-label">${t('hex')}</div><div class="result-box">0x${hex} <button class="copy-btn" onclick="copyText('0x${hex}')">⎘</button></div>
+  `;
+}
+
+function calcWildcard(){
+  const mask=document.getElementById('wc-mask').value.trim();
+  if(!isValidIPv4(mask)){ return; }
+  const p=mask.split('.').map(Number);
+  const wc=p.map(x=>255-x).join('.');
+  document.getElementById('wc-result').textContent=wc;
+}
+
+function calcWildcardRange(){
+  const startStr=document.getElementById('wr-start').value.trim();
+  const endStr=document.getElementById('wr-end').value.trim();
+  const out=document.getElementById('wr-result');
+  if(!isValidIPv4(startStr)||!isValidIPv4(endStr)){ out.innerHTML=''; return; }
+  const start=ipToNum(startStr);
+  const end=ipToNum(endStr);
+  if(start>end){ out.innerHTML=`<div style="color:var(--danger);font-size:11px;margin-top:8px">${t('invalidIP')}</div>`; return; }
+  // Decompose range into minimal set of CIDR blocks (range-to-CIDR algorithm)
+  const blocks=[];
+  let cur=start;
+  while(cur<=end){
+    let maxSize=32;
+    while(maxSize>0){
+      const mask=cidrToMaskNum(maxSize-1);
+      const blockStart=cur&mask;
+      if(blockStart!==cur) break;
+      const blockEnd=(blockStart|(~mask>>>0))>>>0;
+      if(blockEnd>end) break;
+      maxSize--;
+    }
+    const size=32-maxSize;
+    const mask=cidrToMaskNum(size);
+    const blockEnd=(cur|(~mask>>>0))>>>0;
+    blocks.push({start:cur,end:blockEnd,cidr:size});
+    cur=blockEnd+1;
+  }
+  let rows=blocks.map(b=>{
+    const wc=numToIp(~cidrToMaskNum(b.cidr)>>>0);
+    const type=b.cidr===32?t('single'):t('range');
+    return `<tr><td style="color:var(--accent)">${numToIp(b.start)}</td><td>${numToIp(b.end)}</td><td style="color:var(--accent2)">/${b.cidr}</td><td style="color:var(--accent3)">${wc}</td><td style="color:var(--text3)">${type}</td></tr>`;
+  }).join('');
+  out.innerHTML=`
+    <div style="font-size:11px;color:var(--text3);margin:8px 0;font-family:var(--font-mono)">${blocks.length} ${blocks.length===1?'blocco':'blocchi'}</div>
+    <div class="table-scroll"><table class="result-table"><thead><tr><th>Start</th><th>End</th><th>CIDR</th><th>${t('wildcard')}</th><th>${t('type')}</th></tr></thead><tbody>${rows}</tbody></table></div>
+  `;
+}
+
+function compareIPs(){
+  const ip1Str=document.getElementById('cmp-ip1').value.trim();
+  const ip2Str=document.getElementById('cmp-ip2').value.trim();
+  const maskStr=document.getElementById('cmp-mask').value.trim();
+  if(!isValidIPv4(ip1Str)||!isValidIPv4(ip2Str)||!isValidIPv4(maskStr)) return;
+  const ip1=ipToNum(ip1Str);
+  const ip2=ipToNum(ip2Str);
+  const mask=ipToNum(maskStr);
+  const same=(ip1&mask)===(ip2&mask);
+  document.getElementById('cmp-result').innerHTML=`
+    <div style="padding:10px;border-radius:var(--r);background:${same?'#0a2a0a':'#2a0a0a'};border:1px solid ${same?'#1a4a1a':'#4a1010'};color:${same?'var(--success)':'var(--danger)'};font-family:var(--font-mono);font-size:13px;font-weight:600;text-align:center">
+      ${same?t('sameSubnet'):t('diffSubnet')}
+    </div>
+    <div class="info-grid" style="margin-top:8px">
+      <div class="info-pill"><span class="info-pill-label">${t('ip1Net')}</span><span class="info-pill-val">${numToIp(ip1&mask)}</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('ip2Net')}</span><span class="info-pill-val">${numToIp(ip2&mask)}</span></div>
+    </div>
+  `;
+}
+
+function checkOverlap(){
+  const lines=document.getElementById('ovl-in').value.trim().split('\n').filter(l=>l.trim());
+  const out=document.getElementById('ovl-result');
+  const nets=[];
+  lines.forEach(l=>{
+    const parts=l.trim().split('/');
+    if(parts.length!==2) return;
+    const ip=parts[0].trim();
+    const cidr=parseInt(parts[1],10);
+    if(!isValidIPv4(ip)||isNaN(cidr)||cidr<0||cidr>32) return;
+    const base=ipToNum(ip)&cidrToMaskNum(cidr);
+    const end=base+Math.pow(2,32-cidr)-1;
+    nets.push({base,end,cidr,orig:`${ip}/${cidr}`});
+  });
+  if(nets.length<2){ out.innerHTML=`<div style="color:var(--danger);font-size:11px;margin-top:8px">${t('noValidRoutes')}</div>`; return; }
+  const conflicts=[];
+  for(let i=0;i<nets.length;i++){
+    for(let j=i+1;j<nets.length;j++){
+      if(nets[i].base<=nets[j].end && nets[j].base<=nets[i].end){
+        conflicts.push([nets[i],nets[j]]);
+      }
+    }
+  }
+  const ok=conflicts.length===0;
+  let html=`<div style="padding:10px;border-radius:var(--r);background:${ok?'#0a2a0a':'#2a0a0a'};border:1px solid ${ok?'#1a4a1a':'#4a1010'};color:${ok?'var(--success)':'var(--danger)'};font-family:var(--font-mono);font-size:13px;font-weight:600;text-align:center;margin-top:8px">
+    ${ok?t('noOverlap'):t('overlapped')}
+  </div>`;
+  if(!ok){
+    html+=`<div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--font-mono)">${t('conflictingWith')}:</div>`;
+    html+=conflicts.map(([a,b])=>`<div style="font-size:11px;color:var(--danger);font-family:var(--font-mono);padding:4px 0">• ${a.orig} ↔ ${b.orig}</div>`).join('');
+  }
+  out.innerHTML=html;
+}
+
+function genRange(){
+  const input=document.getElementById('range-net').value.trim();
+  const parts=input.split('/');
+  if(parts.length!==2) return;
+  const net=parts[0].trim();
+  const c=parseInt(parts[1],10);
+  if(!isValidIPv4(net)||isNaN(c)||c<0||c>32) return;
+  const base=ipToNum(net)&cidrToMaskNum(c);
+  const count=Math.pow(2,32-c);
+  const show=Math.min(count,50);
+  const ips=[];
+  for(let i=1;i<show-1;i++) ips.push(numToIp(base+i));
+  document.getElementById('range-result').innerHTML=`
+    <div style="font-size:11px;color:var(--text3);margin:8px 0;font-family:var(--font-mono)">${count-2} ${t('hostCount')} (${numToIp(base+1)} – ${numToIp(base+count-2)})${count>50?` • ${t('showing48')}`:''}</div>
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:8px;font-family:var(--font-mono);font-size:11px;color:var(--text);line-height:1.8;max-height:150px;overflow-y:auto">${ips.join(' · ')}</div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="copyText('${ips.join('\\n')}')">${t('copyAllBtn')}</button>
+  `;
+}
+
+/* ============================================================
+   PORTS DATABASE
+============================================================ */
+const PORTS=[
+  {p:20,pr:'TCP',n:'FTP-DATA',d:'FTP data transfer',cat:'remote'},
+  {p:21,pr:'TCP',n:'FTP',d:'FTP control',cat:'remote'},
+  {p:22,pr:'TCP',n:'SSH',d:'Secure Shell',cat:'remote'},
+  {p:23,pr:'TCP',n:'TELNET',d:'Unencrypted remote terminal',cat:'remote'},
+  {p:25,pr:'TCP',n:'SMTP',d:'Email sending',cat:'mail'},
+  {p:53,pr:'BOTH',n:'DNS',d:'Domain Name System',cat:'dns'},
+  {p:67,pr:'UDP',n:'DHCP-S',d:'DHCP Server',cat:'dns'},
+  {p:68,pr:'UDP',n:'DHCP-C',d:'DHCP Client',cat:'dns'},
+  {p:69,pr:'UDP',n:'TFTP',d:'Trivial FTP',cat:'remote'},
+  {p:80,pr:'TCP',n:'HTTP',d:'Unencrypted web',cat:'web'},
+  {p:110,pr:'TCP',n:'POP3',d:'Email retrieval',cat:'mail'},
+  {p:119,pr:'TCP',n:'NNTP',d:'Newsgroups',cat:'web'},
+  {p:123,pr:'UDP',n:'NTP',d:'Network Time Protocol',cat:'monitor'},
+  {p:135,pr:'TCP',n:'RPC',d:'MS RPC endpoint',cat:'remote'},
+  {p:137,pr:'BOTH',n:'NetBIOS-N',d:'NetBIOS Name',cat:'remote'},
+  {p:139,pr:'TCP',n:'NetBIOS-S',d:'NetBIOS Session',cat:'remote'},
+  {p:143,pr:'TCP',n:'IMAP',d:'Email IMAP',cat:'mail'},
+  {p:161,pr:'UDP',n:'SNMP',d:'Network monitoring',cat:'monitor'},
+  {p:162,pr:'UDP',n:'SNMP-T',d:'SNMP Trap',cat:'monitor'},
+  {p:179,pr:'TCP',n:'BGP',d:'Border Gateway Protocol',cat:'dns'},
+  {p:389,pr:'BOTH',n:'LDAP',d:'Directory services',cat:'remote'},
+  {p:443,pr:'TCP',n:'HTTPS',d:'Encrypted web (TLS)',cat:'web'},
+  {p:445,pr:'TCP',n:'SMB',d:'Windows file sharing',cat:'remote'},
+  {p:465,pr:'TCP',n:'SMTPS',d:'SMTP over SSL',cat:'mail'},
+  {p:500,pr:'UDP',n:'IKE',d:'IPsec VPN IKE',cat:'remote'},
+  {p:514,pr:'UDP',n:'SYSLOG',d:'Remote logging',cat:'monitor'},
+  {p:515,pr:'TCP',n:'LPD',d:'Line Printer Daemon',cat:'remote'},
+  {p:520,pr:'UDP',n:'RIP',d:'Routing Information Protocol',cat:'dns'},
+  {p:546,pr:'UDP',n:'DHCPv6-C',d:'DHCPv6 Client',cat:'dns'},
+  {p:547,pr:'UDP',n:'DHCPv6-S',d:'DHCPv6 Server',cat:'dns'},
+  {p:587,pr:'TCP',n:'SMTP-S',d:'SMTP submission (auth)',cat:'mail'},
+  {p:636,pr:'TCP',n:'LDAPS',d:'LDAP over TLS',cat:'remote'},
+  {p:993,pr:'TCP',n:'IMAPS',d:'IMAP over TLS',cat:'mail'},
+  {p:995,pr:'TCP',n:'POP3S',d:'POP3 over TLS',cat:'mail'},
+  {p:1080,pr:'TCP',n:'SOCKS',d:'SOCKS proxy',cat:'web'},
+  {p:1194,pr:'BOTH',n:'OpenVPN',d:'OpenVPN',cat:'remote'},
+  {p:1433,pr:'TCP',n:'MSSQL',d:'Microsoft SQL Server',cat:'db'},
+  {p:1521,pr:'TCP',n:'Oracle',d:'Oracle Database',cat:'db'},
+  {p:1701,pr:'UDP',n:'L2TP',d:'Layer 2 Tunneling',cat:'remote'},
+  {p:1723,pr:'TCP',n:'PPTP',d:'Point-to-Point Tunneling',cat:'remote'},
+  {p:1812,pr:'UDP',n:'RADIUS',d:'RADIUS Auth',cat:'monitor'},
+  {p:1813,pr:'UDP',n:'RADIUS-A',d:'RADIUS Accounting',cat:'monitor'},
+  {p:2049,pr:'BOTH',n:'NFS',d:'Network File System',cat:'remote'},
+  {p:3306,pr:'TCP',n:'MySQL',d:'MySQL / MariaDB',cat:'db'},
+  {p:3389,pr:'TCP',n:'RDP',d:'Remote Desktop Protocol',cat:'remote'},
+  {p:4500,pr:'UDP',n:'IKEv2',d:'IPsec NAT-T',cat:'remote'},
+  {p:5060,pr:'BOTH',n:'SIP',d:'VoIP signaling',cat:'voip'},
+  {p:5061,pr:'TCP',n:'SIPS',d:'SIP over TLS',cat:'voip'},
+  {p:5432,pr:'TCP',n:'PostgreSQL',d:'PostgreSQL Database',cat:'db'},
+  {p:5900,pr:'TCP',n:'VNC',d:'Virtual Network Computing',cat:'remote'},
+  {p:5985,pr:'TCP',n:'WinRM',d:'Windows Remote Mgmt',cat:'remote'},
+  {p:6379,pr:'TCP',n:'Redis',d:'Redis in-memory DB',cat:'db'},
+  {p:6514,pr:'TCP',n:'Syslog-TLS',d:'Syslog over TLS',cat:'monitor'},
+  {p:8080,pr:'TCP',n:'HTTP-alt',d:'Alternative HTTP / proxy',cat:'web'},
+  {p:8443,pr:'TCP',n:'HTTPS-alt',d:'Alternative HTTPS',cat:'web'},
+  {p:9100,pr:'TCP',n:'RAW-PRINT',d:'Direct JetDirect printing',cat:'monitor'},
+  {p:9200,pr:'TCP',n:'Elastic',d:'Elasticsearch REST',cat:'db'},
+  {p:10000,pr:'TCP',n:'Webmin',d:'Webmin admin panel',cat:'monitor'},
+  {p:27017,pr:'TCP',n:'MongoDB',d:'MongoDB',cat:'db'},
+];
+
+function renderPorts(list){
+  const el=document.getElementById('port-results');
+  if(!list.length){ el.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:10px">—</div>`; return; }
+  el.innerHTML=list.map(p=>`
+    <div class="port-row">
+      <span class="port-num">${p.p}</span>
+      <span class="port-proto ${p.pr==='TCP'?'port-tcp':p.pr==='UDP'?'port-udp':'port-both'}">${p.pr}</span>
+      <span class="port-name">${p.n}</span>
+      <span class="port-desc">${p.d}</span>
+    </div>
+  `).join('');
+}
+function searchPorts(){
+  const q=document.getElementById('port-search').value.toLowerCase();
+  if(!q){ renderPorts(PORTS.slice(0,30)); return; }
+  const r=PORTS.filter(p=>p.p.toString().includes(q)||p.n.toLowerCase().includes(q)||p.d.toLowerCase().includes(q));
+  renderPorts(r);
+}
+function filterCategory(cat){
+  document.getElementById('port-search').value='';
+  if(!cat){ renderPorts(PORTS.slice(0,40)); return; }
+  renderPorts(PORTS.filter(p=>p.cat===cat));
+}
+
+/* ============================================================
+   BANDWIDTH
+============================================================ */
+function setBW(v){ document.getElementById('bw-speed').value=v; updateBWSlider(); calcTransfer(); }
+function updateBWSlider(){
+  const v=parseInt(document.getElementById('bw-speed').value,10);
+  document.getElementById('bw-speed-label').textContent=v>=1000?`${v/1000} Gbps`:`${v} Mbps`;
+}
+function calcTransfer(){
+  const sizeMB=parseFloat(document.getElementById('bw-size').value)*parseFloat(document.getElementById('bw-unit').value);
+  const mbps=parseInt(document.getElementById('bw-speed').value,10);
+  if(!sizeMB||!mbps){ document.getElementById('bw-result').innerHTML=''; return; }
+  const secs=sizeMB*8/mbps;
+  const fmt=s=>s<60?`${s.toFixed(1)}s`:s<3600?`${Math.floor(s/60)}m ${(s%60).toFixed(0)}s`:`${Math.floor(s/3600)}h ${Math.floor((s%3600)/60)}m`;
+  document.getElementById('bw-result').innerHTML=`
+    <div class="info-pill"><span class="info-pill-label">${t('time')}</span><span class="info-pill-val" style="color:var(--accent)">${fmt(secs)}</span></div>
+    <div class="info-pill"><span class="info-pill-label">${t('speed')}</span><span class="info-pill-val">${mbps>=1000?mbps/1000+'Gbps':mbps+'Mbps'}</span></div>
+    <div class="info-pill"><span class="info-pill-label">${t('mbpsTheo')}</span><span class="info-pill-val">${(mbps/8).toFixed(1)}</span></div>
+    <div class="info-pill"><span class="info-pill-label">${t('size')}</span><span class="info-pill-val">${sizeMB>=1024?(sizeMB/1024).toFixed(2)+' GB':sizeMB.toFixed(1)+' MB'}</span></div>
+  `;
+}
+function calcThroughput(){
+  const total=parseFloat(document.getElementById('th-total').value)||0;
+  const pct=parseFloat(document.getElementById('th-pct').value)||0;
+  const used=total*pct/100;
+  const free=total-used;
+  const color=pct>90?'var(--danger)':pct>70?'var(--warning)':'var(--success)';
+  const status=pct>90?t('critical'):pct>70?t('high'):t('normal');
+  document.getElementById('th-result').innerHTML=`
+    <div class="info-grid" style="margin-top:8px">
+      <div class="info-pill"><span class="info-pill-label">${t('used')}</span><span class="info-pill-val" style="color:${color}">${used.toFixed(1)} Mbps</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('free')}</span><span class="info-pill-val" style="color:var(--success)">${free.toFixed(1)} Mbps</span></div>
+    </div>
+    <div style="margin-top:10px;background:var(--bg3);border-radius:4px;height:8px;overflow:hidden">
+      <div style="height:100%;width:${Math.min(pct,100)}%;background:${color};border-radius:4px;transition:width .3s"></div>
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--font-mono)">${t('usage')}: ${pct}% – ${status}</div>
+  `;
+}
+function convertData(){
+  const factors={bit:1,byte:8,kb:1000,KB:8192,mb:1e6,MB:8388608,gb:1e9,GB:8589934592,TB:8796093022208};
+  const v=parseFloat(document.getElementById('du-val').value)||0;
+  const from=document.getElementById('du-from').value;
+  const bits=v*factors[from];
+  const units=['bit','byte','KB','MB','GB','TB'];
+  const divs=[1,8,8192,8388608,8589934592,8796093022208];
+  const names=[t('bit'),t('byte'),t('kbyte'),t('mbyte'),t('gbyte'),t('tb')];
+  let html='<div style="margin-top:8px">';
+  units.forEach((u,i)=>{
+    const val=bits/divs[i];
+    if(val>=0.001) html+=`<div class="port-row"><span class="port-name" style="color:var(--text3)">${names[i]}</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--accent)">${val>=1e9?val.toExponential(3):val>=1?val.toLocaleString(currentLang==='it'?'it':'en',{maximumFractionDigits:4}):val.toExponential(3)}</span></div>`;
+  });
+  html+='</div>';
+  document.getElementById('du-result').innerHTML=html;
+}
+
+/* ============================================================
+   CONVERTERS
+============================================================ */
+let _convLock=false;
+function convertNum(src){
+  if(_convLock) return;
+  _convLock=true;
+  try{
+    let dec;
+    if(src==='dec') dec=parseInt(document.getElementById('conv-dec').value,10)||0;
+    else if(src==='bin') dec=parseInt(document.getElementById('conv-bin').value,2)||0;
+    else if(src==='hex') dec=parseInt(document.getElementById('conv-hex').value,16)||0;
+    else if(src==='oct') dec=parseInt(document.getElementById('conv-oct').value,8)||0;
+    if(isNaN(dec)||dec<0) dec=0;
+    if(src!=='dec') document.getElementById('conv-dec').value=dec;
+    if(src!=='bin') document.getElementById('conv-bin').value=dec.toString(2);
+    if(src!=='hex') document.getElementById('conv-hex').value=dec.toString(16).toUpperCase();
+    if(src!=='oct') document.getElementById('conv-oct').value=dec.toString(8);
+  } finally { _convLock=false; }
+}
+
+function analyzeMac(){
+  let mac=document.getElementById('mac-in').value.trim().toUpperCase();
+  mac=mac.replace(/[^0-9A-F]/g,'');
+  const out=document.getElementById('mac-result');
+  if(mac.length!==12){ out.innerHTML=''; return; }
+  const formatted=[mac.slice(0,2),mac.slice(2,4),mac.slice(4,6),mac.slice(6,8),mac.slice(8,10),mac.slice(10,12)];
+  const colon=formatted.join(':');
+  const dash=formatted.join('-');
+  const cisco=formatted.slice(0,2).join('')+'.'+formatted.slice(2,4).join('')+'.'+formatted.slice(4).join('');
+  const oui=mac.slice(0,6);
+  const firstByte=parseInt(mac.slice(0,2),16);
+  const multicast=(firstByte&0x01)===0x01;
+  const local=(firstByte&0x02)===0x02;
+  const type=multicast?t('multicast'):local?t('localAdmin'):t('unicastGlobal');
+  out.innerHTML=`
+    <div class="info-grid" style="margin-top:8px">
+      <div class="info-pill" style="grid-column:span 2"><span class="info-pill-label">${t('ieeeColon')}</span><span class="info-pill-val">${colon} <button class="copy-btn" onclick="copyText('${colon}')">⎘</button></span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('dash')}</span><span class="info-pill-val">${dash}</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('cisco')}</span><span class="info-pill-val">${cisco}</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('oui')}</span><span class="info-pill-val">${oui}</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('macType')}</span><span class="info-pill-val">${type}</span></div>
+    </div>
+  `;
+}
+
+let _mcidrLock=false;
+function maskToCidr(){
+  if(_mcidrLock) return; _mcidrLock=true;
+  const m=document.getElementById('mcidr-mask').value.trim();
+  if(isValidIPv4(m)){
+    const c=maskToCidrNum(m);
+    document.getElementById('mcidr-cidr').value='/'+c;
+  }
+  _mcidrLock=false;
+}
+function cidrToMask(){
+  if(_mcidrLock) return; _mcidrLock=true;
+  const c=parseInt(document.getElementById('mcidr-cidr').value.replace('/',''),10);
+  if(!isNaN(c)&&c>=0&&c<=32) document.getElementById('mcidr-mask').value=numToIp(cidrToMaskNum(c));
+  _mcidrLock=false;
+}
+
+function encodeAll(){
+  const txt=document.getElementById('enc-in').value;
+  const hex=[...txt].map(c=>c.charCodeAt(0).toString(16).padStart(2,'0').toUpperCase()).join(' ');
+  const b64=btoa(unescape(encodeURIComponent(txt)));
+  const url=encodeURIComponent(txt);
+  document.getElementById('enc-result').innerHTML=`
+    <div class="result-label">HEX</div><div class="result-box" style="font-size:11px">${hex||'—'}</div>
+    <div class="result-label">Base64</div><div class="result-box">${b64} <button class="copy-btn" onclick="copyText('${b64}')">⎘</button></div>
+    <div class="result-label">${t('urlEnc')}</div><div class="result-box" style="font-size:11px">${url}</div>
+  `;
+}
+
+/* ============================================================
+   CABLE
+============================================================ */
+const T568A=[['1','Bianco-Verde'],['2','Verde'],['3','Bianco-Arancio'],['4','Blu'],['5','Bianco-Blu'],['6','Arancio'],['7','Bianco-Marrone'],['8','Marrone']];
+const T568B=[['1','Bianco-Arancio'],['2','Arancio'],['3','Bianco-Verde'],['4','Blu'],['5','Bianco-Blu'],['6','Verde'],['7','Bianco-Marrone'],['8','Marrone']];
+const COLORS={'Bianco-Verde':'#c8ffc8','Verde':'#00aa44','Bianco-Arancio':'#ffe4c8','Arancio':'#ff8800','Blu':'#4488ff','Bianco-Blu':'#c8d8ff','Bianco-Marrone':'#f0e0d0','Marrone':'#885522'};
+function renderPinTable(data,id){
+  document.getElementById(id).innerHTML=data.map(([p,c])=>
+    `<tr><td style="font-weight:600">${p}</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${COLORS[c]||'#888'};margin-right:4px;border:1px solid rgba(255,255,255,.3)"></span>${c}</td></tr>`
+  ).join('');
+}
+function calcFiber(){
+  const d=parseFloat(document.getElementById('fib-dist').value)||0;
+  const att=parseFloat(document.getElementById('fib-type').value);
+  const conn=parseInt(document.getElementById('fib-conn').value,10)||0;
+  const connAtt=0.5;
+  const total=d*att+conn*connAtt;
+  const margin=3;
+  const budget=24;
+  const avail=budget-total-margin;
+  const ok=avail>0;
+  document.getElementById('fib-result').innerHTML=`
+    <div class="info-grid" style="margin-top:8px">
+      <div class="info-pill"><span class="info-pill-label">${t('fiberAtt')}</span><span class="info-pill-val">${(d*att).toFixed(2)} dB</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('connAtt')}</span><span class="info-pill-val">${(conn*connAtt).toFixed(2)} dB</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('totalAtt')}</span><span class="info-pill-val" style="color:${ok?'var(--success)':'var(--danger)'}">${total.toFixed(2)} dB</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('margin')}</span><span class="info-pill-val" style="color:${ok?'var(--success)':'var(--danger)'}">${avail.toFixed(2)} dB ${ok?'✓':'✗'}</span></div>
+    </div>
+    <div style="margin-top:6px;font-size:10px;color:var(--text3);font-family:var(--font-mono)">${t('budget')}: ${budget}dB | ${t('safetyMargin')}: ${margin}dB | ${t('connectors')}: ${connAtt}dB ${t('connEach')}.</div>
+  `;
+}
+
+/* ============================================================
+   WIFI
+============================================================ */
+function renderCh24(){
+  const chs=[1,2,3,4,5,6,7,8,9,10,11,12,13];
+  const primary=[1,6,11];
+  document.getElementById('ch24-viz').innerHTML=chs.map(n=>
+    `<span style="display:inline-block;width:calc(100%/13);text-align:center;color:${primary.includes(n)?'var(--accent)':'var(--text3)'};font-size:${primary.includes(n)?'13px':'11px'};font-weight:${primary.includes(n)?'600':'400'}">${n}</span>`
+  ).join('')+
+  `<div style="margin-top:4px;height:6px;background:linear-gradient(90deg,#0090ff,#00d4aa,#a855f7);border-radius:3px;opacity:0.5"></div>
+  <div style="margin-top:4px;color:var(--text3);font-size:10px">2402–2483 MHz • 22 MHz channel width</div>`;
+}
+function calcFSPL(){
+  const d=parseFloat(document.getElementById('fspl-dist').value)||1;
+  const f=parseFloat(document.getElementById('fspl-freq').value)*1e6;
+  const eirp=parseFloat(document.getElementById('fspl-eirp').value)||0;
+  const fspl=20*Math.log10(d)+20*Math.log10(f)+20*Math.log10(4*Math.PI/3e8);
+  const rx=eirp-fspl;
+  const qual=rx>-65?'Excellent':rx>-75?'Good':rx>-85?'Weak':'Insufficient';
+  const qualT=rx>-65?t('great'):rx>-75?t('good'):rx>-85?t('weak'):t('noSignal');
+  const col=rx>-65?'var(--success)':rx>-75?'var(--warning)':'var(--danger)';
+  document.getElementById('fspl-result').innerHTML=`
+    <div class="info-grid" style="margin-top:8px">
+      <div class="info-pill"><span class="info-pill-label">${t('fsplLbl')}</span><span class="info-pill-val">${fspl.toFixed(1)} dB</span></div>
+      <div class="info-pill"><span class="info-pill-label">${t('rssiEst')}</span><span class="info-pill-val" style="color:${col}">${rx.toFixed(1)} dBm</span></div>
+      <div class="info-pill" style="grid-column:span 2"><span class="info-pill-label">${t('quality')}</span><span class="info-pill-val" style="color:${col}">${qualT}</span></div>
+    </div>
+  `;
+}
+function convertDBm(src){
+  const dbmInput=document.getElementById('dbm-in');
+  const mwInput=document.getElementById('mw-in');
+  if(src==='dbm'){
+    const dbm=parseFloat(dbmInput.value)||0;
+    mwInput.value=Math.pow(10,dbm/10).toFixed(4);
+  } else {
+    const mw=parseFloat(mwInput.value)||0.001;
+    dbmInput.value=(10*Math.log10(mw)).toFixed(2);
+  }
+  const dbm=parseFloat(dbmInput.value)||0;
+  const guide=[[-100,t('noSignal')],[-90,t('minAbs')],[-80,t('veryWeak')],[-70,t('weak')],[-65,t('voipThreshold')],[-55,t('good')],[-40,t('great')],[-30,t('excellent')],[20,t('apPower')]];
+  const closest=guide.reduce((a,b)=>Math.abs(b[0]-dbm)<Math.abs(a[0]-dbm)?b:a);
+  document.getElementById('dbm-guide').innerHTML=`<div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);padding:6px;background:var(--bg3);border-radius:var(--r)">${closest[1]} (${t('ref')}: ${closest[0]} dBm)</div>`;
+}
+
+/* ============================================================
+   SECURITY
+============================================================ */
+function genPassword(){
+  const len=parseInt(document.getElementById('pw-len').value,10);
+  let chars='';
+  if(document.getElementById('pw-upper').checked) chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if(document.getElementById('pw-lower').checked) chars+='abcdefghijklmnopqrstuvwxyz';
+  if(document.getElementById('pw-nums').checked) chars+='0123456789';
+  if(document.getElementById('pw-sym').checked) chars+='!@#$%^&*()-_=+[]{}|;:,.<>?';
+  if(!chars) chars='abcdefghijklmnopqrstuvwxyz';
+  const n=chars.length;
+  let pw='';
+  const arr=new Uint32Array(1);
+  // Rejection sampling per distribuzione uniforme
+  const limit=Math.floor(0xFFFFFFFF/n)*n;
+  while(pw.length<len){
+    crypto.getRandomValues(arr);
+    const r=arr[0];
+    if(r<limit) pw+=chars[r%n];
+  }
+  document.getElementById('pw-output').textContent=pw;
+  analyzePasswordStr(pw);
+}
+
+function analyzePasswordStr(pw){
+  let score=0;
+  if(pw.length>=8) score++;
+  if(pw.length>=12) score++;
+  if(pw.length>=16) score++;
+  if(/[A-Z]/.test(pw)) score++;
+  if(/[a-z]/.test(pw)) score++;
+  if(/[0-9]/.test(pw)) score++;
+  if(/[^a-zA-Z0-9]/.test(pw)) score++;
+  const labels=t('strength');
+  const colors=['','var(--danger)','var(--danger)','var(--warning)','var(--warning)','var(--success)','var(--success)','var(--accent)'];
+  let charset=0;
+  if(/[a-z]/.test(pw)) charset+=26;
+  if(/[A-Z]/.test(pw)) charset+=26;
+  if(/[0-9]/.test(pw)) charset+=10;
+  if(/[^a-zA-Z0-9]/.test(pw)) charset+=32;
+  const entropy=charset>0?(pw.length*Math.log2(charset)).toFixed(1):'0';
+  return `
+    <div style="display:flex;gap:4px;margin-bottom:4px">${Array(7).fill(0).map((_,i)=>`<div style="height:4px;flex:1;border-radius:2px;background:${i<score?colors[score]:'var(--border)'}"></div>`).join('')}</div>
+    <div style="font-size:11px;color:${colors[score]};font-family:var(--font-mono)">${labels[score]||'—'} • ${t('entropy')}: ${t('approx')}${entropy} bit</div>
+  `;
+}
+
+async function generateHash(){
+  const text=document.getElementById('hash-in').value;
+  const enc=new TextEncoder().encode(text);
+  const algos=['SHA-1','SHA-256','SHA-384','SHA-512'];
+  const results=[];
+  for(const algo of algos){
+    try{
+      const buf=await crypto.subtle.digest(algo,enc);
+      const hex=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+      results.push([algo,hex]);
+    }catch(e){}
+  }
+  document.getElementById('hash-result').innerHTML='<div style="margin-top:8px">'+results.map(([a,h])=>`
+    <div class="result-label">${a}</div>
+    <div class="result-box" style="font-size:10px;word-break:break-all">${h} <button class="copy-btn" onclick="copyText('${h}')">⎘</button></div>
+  `).join('')+'</div>';
+}
+
+function analyzePassword(){
+  const pw=document.getElementById('pwa-in').value;
+  if(!pw){ document.getElementById('pwa-result').innerHTML=''; return; }
+  document.getElementById('pwa-result').innerHTML=analyzePasswordStr(pw);
+}
+
+function aggregateRoutes(){
+  const lines=document.getElementById('aggr-in').value.trim().split('\n').filter(l=>l.trim());
+  const out=document.getElementById('aggr-result');
+  if(!lines.length){ out.innerHTML=''; return; }
+  const nets=[];
+  lines.forEach(l=>{
+    const parts=l.trim().split('/');
+    if(parts.length!==2) return;
+    const ip=parts[0].trim();
+    const cidr=parseInt(parts[1],10);
+    if(!isValidIPv4(ip)||isNaN(cidr)||cidr<0||cidr>32) return;
+    const base=ipToNum(ip)&cidrToMaskNum(cidr);
+    nets.push({base,cidr});
+  });
+  if(!nets.length){
+    out.innerHTML=`<div style="color:var(--danger);font-size:11px;margin-top:8px">${t('noValidRoutes')}</div>`; return;
+  }
+  // Deduplicate and remove contained networks
+  nets.sort((a,b)=>a.base-b.base||a.cidr-b.cidr);
+  const cleaned=[];
+  for(const n of nets){
+    const end=n.base+Math.pow(2,32-n.cidr)-1;
+    if(cleaned.some(c=>c.base<=n.base && c.base+Math.pow(2,32-c.cidr)-1>=end)) continue;
+    cleaned.push(n);
+  }
+  // Bottom-up summarization
+  let collapsed=[...cleaned];
+  let changed=true;
+  while(changed){
+    changed=false;
+    const newList=[];
+    let i=0;
+    while(i<collapsed.length){
+      if(i+1<collapsed.length){
+        const a=collapsed[i];
+        const b=collapsed[i+1];
+        if(a.cidr===b.cidr && a.cidr>0){
+          const parentMask=cidrToMaskNum(a.cidr-1);
+          const parentA=a.base&parentMask;
+          const parentB=b.base&parentMask;
+          if(parentA===parentB){
+            newList.push({base:parentA,cidr:a.cidr-1});
+            i+=2; changed=true; continue;
+          }
+        }
+      }
+      newList.push(collapsed[i]);
+      i++;
+    }
+    collapsed=newList;
+  }
+  const rows=collapsed.map(r=>`<tr><td style="color:var(--accent)">${numToIp(r.base)}/${r.cidr}</td><td style="color:var(--text3)">${numToIp(cidrToMaskNum(r.cidr))}</td><td>${Math.pow(2,32-r.cidr)-2} ${t('host')}</td></tr>`).join('');
+  out.innerHTML=`
+    <div style="font-size:11px;color:var(--success);margin:8px 0;font-family:var(--font-mono)">${lines.length} ${t('routes')} → ${collapsed.length} ${t('supernets')}</div>
+    <div class="table-scroll"><table class="result-table"><thead><tr><th>${t('supernet')}</th><th>Mask</th><th>${t('host')}</th></tr></thead><tbody>${rows}</tbody></table></div>
+  `;
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+window.onload=()=>{
+  // Load shared params
+  const params=new URLSearchParams(location.search);
+  if(params.get('ip')) document.getElementById('sn-ip').value=params.get('ip');
+  if(params.get('mask')) document.getElementById('sn-cidr').value=params.get('mask');
+
+  renderPorts(PORTS.slice(0,30));
+  renderPinTable(T568A,'568a-body');
+  renderPinTable(T568B,'568b-body');
+  renderCh24();
+  calcSubnet();
+  calcWildcard();
+  convertIP();
+  calcTransfer();
+  calcThroughput();
+  convertData();
+  calcFiber();
+  calcFSPL();
+  convertDBm('dbm');
+  encodeAll();
+  genPassword();
+  calcWildcardRange();
+  const dec=document.getElementById('conv-dec');
+  dec.value=255;
+  convertNum('dec');
+
+  // Apply saved language
+  setLang(currentLang);
+
+  // Register service worker (PWA)
+  if('serviceWorker' in navigator){
+    // SW inline via Blob (for demo purposes; in production use a separate file)
+    const swCode=`
+      const CACHE='netops-v2.1';
+      self.addEventListener('install',e=>{ self.skipWaiting(); });
+      self.addEventListener('activate',e=>{ e.waitUntil(clients.claim()); });
+      self.addEventListener('fetch',e=>{
+        e.respondWith(
+          caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{
+            if(e.request.method==='GET' && resp.ok){
+              const clone=resp.clone();
+              caches.open(CACHE).then(c=>c.put(e.request,clone));
+            }
+            return resp;
+          }).catch(()=>caches.match(e.request)))
+        );
+      });
+    `;
+    try{
+      const blob=new Blob([swCode],{type:'application/javascript'});
+      const swUrl=URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swUrl).catch(()=>{});
+    }catch(e){}
+  }
+};
+</script>
+</body>
+</html>
